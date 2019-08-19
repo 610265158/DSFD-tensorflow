@@ -37,7 +37,7 @@ config.TRAIN.vis=False
 
 config.TRAIN.norm='BN'    ##'GN' OR 'BN'
 config.TRAIN.lock_basenet_bn=False
-onfig.TRAIN.frozen_stages=-1   ##no freeze
+config.TRAIN.frozen_stages=-1   ##no freeze
 
 config.TEST = edict()
 config.TEST.PARALLEL_ITERATIONS=8
