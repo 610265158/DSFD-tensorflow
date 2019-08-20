@@ -124,15 +124,6 @@ if u like to show the anchor stratergy, u could simply run :
 it will draw the anchor one by one,
 
 
-#### data augmentation
-
-if u like to know how the data augmentation works, run :
-
-`python lib/dataset/augmentor/augmentation.py`
-
-
-
-
 
 ### References
 [DSFD: Dual Shot Face Detector](https://arxiv.org/abs/1810.10220?utm_source=feedburner&utm_medium=feed&utm_campaign=Feed%3A+arxiv%2FQSXk+%28ExcitingAds%21+cs+updates+on+arXiv.org%29)
