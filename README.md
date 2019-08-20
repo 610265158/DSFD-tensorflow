@@ -1,5 +1,8 @@
 # [DSFD](https://arxiv.org/abs/1810.10220?utm_source=feedburner&utm_medium=feed&utm_campaign=Feed%3A+arxiv%2FQSXk+%28ExcitingAds%21+cs+updates+on+arXiv.org%29)
 
+[toc]
+
+
 ## introduction
 
 A tensorflow implement dsfd, and there is something different with the origin paper.
@@ -7,13 +10,12 @@ A tensorflow implement dsfd, and there is something different with the origin pa
 It‘s a ssd-like object detect framework, but slightly different,
 combines lots of tricks for face detection, such as dual-shot, dense anchor match, FPN,FEM and so on.
 
-now it is mainly optimised about face detection,
-and borrows some codes from other repos
+Now it is mainly optimised about face detection,and borrows some codes from other repos
 
-ps, the code maybe not that clear, please be patience, and i am still working on it, and forgive me for my poor english :)
+Ps, the code maybe not that clear, please be patience, and i am still working on it, and forgive me for my poor english :)
 
 
-the evaluation results are based on vgg with batchsize(2x6),pretrained model can be download from
+The evaluation results are based on vgg with batchsize(2x6),pretrained model can be download from
 https://pan.baidu.com/s/1cUqnf9BwUVkCy0iT6EczKA ( password ty4d )
 
 widerface  val set
@@ -55,13 +57,11 @@ release it in the root dir,
 
 4. if recover from a complet pretrained model  set config.MODEL.pretrained_model='yourmodel.ckpt',config.MODEL.continue_train=True
 
-then, run:
+5. then, run:
 
 `python train.py`
 
 and if u want to check the data when training, u could set vis in train_config.py as True
-
-
 
 
 After training, run :
