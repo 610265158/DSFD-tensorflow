@@ -139,7 +139,7 @@ class MutiScaleBatcher(BatchData):
             max_shape[0] = int(np.ceil(max_shape[0] / self.divide_size) * self.divide_size)
             max_shape[1] = int(np.ceil(max_shape[1] / self.divide_size) * self.divide_size)
 
-            cfg.ANCHOR.achor.reset_anchors((max_shape[0], max_shape[1]))
+            cfg.ANCHOR.achor.reset_anchors((max_shape[1], max_shape[0]))
         else:
             max_shape=self.input_size
 
