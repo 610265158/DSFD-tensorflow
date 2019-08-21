@@ -72,7 +72,7 @@ it reads the checkpoint file and produces detector.pb .
 
 
 ### evaluation
-
+** fddb **
 ```
     python model_eval/fddb.py [--model [TRAINED_MODEL]] [--data_dir [DATA_DIR]]
                           [--split_dir [SPLIT_DIR]] [--result [RESULT_DIR]]
@@ -86,7 +86,8 @@ example `python model_eval/fddb.py --model model/detector.pb
                                     --data_dir 'fddb/img/' 
                                     --split_dir fddb/FDDB-folds/ 
                                     --result 'result/' `
-
+                                    
+** widerface **
 ```
     python model_eval/wider.py [--model [TRAINED_MODEL]] [--data_dir [DATA_DIR]]
                            [--result [RESULT_DIR]]

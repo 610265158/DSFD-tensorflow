@@ -8,7 +8,7 @@ from lib.core.model.net.arg_scope.resnet_args_cope import resnet_arg_scope
 def cpm(product,scope):
 
 
-    dim=cfg.MODEL.FEM_dims
+    dim=cfg.MODEL.fem_dims
     with tf.variable_scope(scope):
 
         eyes_1=slim.conv2d(product, dim//2, [3, 3], stride=1,rate=1, activation_fn=tf.nn.relu,normalizer_fn=None, scope='eyes_1')

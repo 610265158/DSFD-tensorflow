@@ -89,7 +89,7 @@ class Anchor():
         self.ratios=cfg.ANCHOR.ANCHOR_RATIOS
 
 
-        self.max_size=cfg.DATA.MAX_SIZE     ##use to calculate the anchor
+        self.max_size=cfg.DATA.max_size     ##use to calculate the anchor
 
         self.anchors=self.produce_anchors()
 
@@ -276,7 +276,7 @@ class Anchor():
         self.anchors = self.produce_anchors()
 
 if __name__=='__main__':
-    ##test the  anchor codes there
+    ##model_eval the  anchor codes there
     import cv2
 
     cell_anchor = CellAnchor.generate_cell_anchor()
@@ -287,7 +287,7 @@ if __name__=='__main__':
 
     all_anchor= anchor_maker.anchors
     print(len(all_anchor))
-    image=np.ones(shape=[cfg.DATA.MAX_SIZE[0],cfg.DATA.MAX_SIZE[1],3])*255
+    image=np.ones(shape=[cfg.DATA.max_size[0],cfg.DATA.max_size[1],3])*255
 
     # for x in anchors:
     #     print(x.shape)

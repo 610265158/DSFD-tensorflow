@@ -75,15 +75,15 @@ def ssd_out(fms,L2_reg,training=True,ratios_per_pixel=num_predict_per_level):
                 reg_out = slim.conv2d(feature_halo, ratios_per_pixel*4, [3, 3], stride=1, activation_fn=None,normalizer_fn=None, scope='out_reg%d'%i)
 
                 if cfg.MODEL.maxout and i==0:
-                    cla_out = max_out_cla(feature_halo,ratios_per_pixel,cla_num=cfg.DATA.NUM_CLASS,scope='maxout%d'%i)
+                    cla_out = max_out_cla(feature_halo,ratios_per_pixel,cla_num=cfg.DATA.num_class,scope='maxout%d'%i)
                 else:
-                    cla_out = slim.conv2d(feature_halo, ratios_per_pixel*cfg.DATA.NUM_CLASS, [3, 3], stride=1, activation_fn=None,normalizer_fn=None, scope='out_cla%d'%i)
+                    cla_out = slim.conv2d(feature_halo, ratios_per_pixel*cfg.DATA.num_class, [3, 3], stride=1, activation_fn=None,normalizer_fn=None, scope='out_cla%d'%i)
 
                 reg_out = tf.reshape(reg_out, ([-1, dim_h, dim_w, ratios_per_pixel, 4]))
                 reg_out = tf.reshape(reg_out, ([-1, dim_h * dim_w * ratios_per_pixel, 4]))
 
-                cla_out = tf.reshape(cla_out, ([-1, dim_h, dim_w, ratios_per_pixel, cfg.DATA.NUM_CLASS]))
-                cla_out = tf.reshape(cla_out, ([-1, dim_h * dim_w* ratios_per_pixel,cfg.DATA.NUM_CLASS]))
+                cla_out = tf.reshape(cla_out, ([-1, dim_h, dim_w, ratios_per_pixel, cfg.DATA.num_class]))
+                cla_out = tf.reshape(cla_out, ([-1, dim_h * dim_w* ratios_per_pixel,cfg.DATA.num_class]))
 
 
 

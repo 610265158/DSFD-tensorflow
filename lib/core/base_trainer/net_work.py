@@ -186,7 +186,6 @@ class trainner():
             opt, lr, global_step = self.get_opt()
 
             ##some global placeholder
-            keep_prob = tf.placeholder(tf.float32, name="keep_prob")
             L2_reg = tf.placeholder(tf.float32, name="L2_reg")
             training = tf.placeholder(tf.bool, name="training_flag")
 
@@ -291,7 +290,6 @@ class trainner():
             self.inputs = [images_place_holder_list,
                            boxes_place_holder_list,
                            labels_place_holder_list,
-                           keep_prob,
                            L2_reg,
                            training]
             self.outputs = [train_op,
@@ -402,9 +400,8 @@ class trainner():
                     feed_dict[self.inputs[1][n]] = examples[1][n*cfg.TRAIN.batch_size:(n+1)*cfg.TRAIN.batch_size]
                     feed_dict[self.inputs[2][n]] = examples[2][n*cfg.TRAIN.batch_size:(n+1)*cfg.TRAIN.batch_size]
 
-                feed_dict[self.inputs[3]] = cfg.TRAIN.dropout
-                feed_dict[self.inputs[4]] = cfg.TRAIN.weight_decay_factor
-                feed_dict[self.inputs[5]] = True
+                feed_dict[self.inputs[3]] = cfg.TRAIN.weight_decay_factor
+                feed_dict[self.inputs[4]] = True
 
                 fetch_duration = time.time() - start_time
 
@@ -461,9 +458,8 @@ class trainner():
                 feed_dict[self.inputs[1][n]] = examples[1][n*cfg.TRAIN.batch_size:(n+1)*cfg.TRAIN.batch_size]
                 feed_dict[self.inputs[2][n]] = examples[2][n*cfg.TRAIN.batch_size:(n+1)*cfg.TRAIN.batch_size]
 
-            feed_dict[self.inputs[3]] = 1
-            feed_dict[self.inputs[4]] = 0
-            feed_dict[self.inputs[5]] = False
+            feed_dict[self.inputs[3]] = 0
+            feed_dict[self.inputs[4]] = False
 
             total_loss_value, reg_loss_value,cla_loss_value, l2_loss_value, lr_value = \
                 self.sess.run([*self.val_outputs],

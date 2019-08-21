@@ -6,13 +6,10 @@ import os
 import cv2
 from tqdm import tqdm
 import argparse
-import tensorflow as tf
-
 
 from lib.core.api.face_detector import FaceDetector
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-
 
 ap = argparse.ArgumentParser()
 ap.add_argument( "--model", required=False, default='./model/detector.pb', help="model to eval:")

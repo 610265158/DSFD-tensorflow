@@ -56,7 +56,6 @@ def batch_non_max_suppression(
         scores = tf.pad(scores, [[0, zero_padding]])
         labels = tf.pad(labels, [[0, zero_padding]],constant_values=-1)
 
-        print('label',labels)
         boxes.set_shape([max_boxes, 4])
         scores.set_shape([max_boxes])
         labels.set_shape([max_boxes])
@@ -65,7 +64,7 @@ def batch_non_max_suppression(
     boxes, scores, labels, num_detections = tf.map_fn(
         fn, [boxes, scores,labels],
         dtype=(tf.float32, tf.float32,tf.int64, tf.int32),
-        parallel_iterations=cfg.TEST.PARALLEL_ITERATIONS,
+        parallel_iterations=cfg.TEST.parallel_iterations,
         back_prop=False, swap_memory=False, infer_shape=True
     )
     return boxes, scores,labels, num_detections

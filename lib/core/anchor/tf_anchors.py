@@ -84,7 +84,7 @@ def get_all_anchors_fpn(strides=None, sizes=None,max_size=[640,640]):
     if sizes is None:
         sizes = cfg.ANCHOR.ANCHOR_SIZES
     if max_size is None:
-        max_size= [cfg.DATA.MAX_SIZE,cfg.DATA.MAX_SIZE]
+        max_size= [cfg.DATA.max_size,cfg.DATA.max_size]
 
     assert len(strides) == len(sizes)
     foas = []
@@ -111,12 +111,12 @@ if __name__=='__main__':
 
     anchors=np.array(anchors)
     print(anchors.shape)
-    image = np.ones(shape=[cfg.DATA.MAX_SIZE, cfg.DATA.MAX_SIZE, 3]) * 255
+    image = np.ones(shape=[cfg.DATA.max_size, cfg.DATA.max_size, 3]) * 255
     for i in range(0,anchors.shape[0]):
         box=anchors[i]
-        print(int(round((box[2]-box[0])*cfg.DATA.MAX_SIZE)))
-        cv2.rectangle(image, (int(round(box[0]*cfg.DATA.MAX_SIZE)), int(round(box[1]*cfg.DATA.MAX_SIZE))),
-                      (int(round(box[2]*cfg.DATA.MAX_SIZE)), int(round(box[3]*cfg.DATA.MAX_SIZE))), (255, 0, 0), 1)
+        print(int(round((box[2]-box[0])*cfg.DATA.max_size)))
+        cv2.rectangle(image, (int(round(box[0]*cfg.DATA.max_size)), int(round(box[1]*cfg.DATA.max_size))),
+                      (int(round(box[2]*cfg.DATA.max_size)), int(round(box[3]*cfg.DATA.max_size))), (255, 0, 0), 1)
 
         cv2.namedWindow('anchors',0)
         cv2.imshow('anchors',image)

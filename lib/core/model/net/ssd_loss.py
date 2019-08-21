@@ -101,7 +101,7 @@ def focal_loss(prediction_tensor, target_tensor, weights=None, alpha=0.25, gamma
     Returns:
         loss: A (scalar) tensor representing the value of the loss function
     """
-    target_tensor=tf.one_hot(target_tensor,depth=cfg.DATA.NUM_CLASS)
+    target_tensor=tf.one_hot(target_tensor,depth=cfg.DATA.num_class)
 
     sigmoid_p = tf.nn.sigmoid(prediction_tensor)
     zeros = array_ops.zeros_like(sigmoid_p, dtype=sigmoid_p.dtype)
@@ -122,7 +122,7 @@ def focal_loss(prediction_tensor, target_tensor, weights=None, alpha=0.25, gamma
 def ohem_loss(logits, targets, weights):
 
 
-    logits=tf.reshape(logits,shape=[-1,cfg.DATA.NUM_CLASS])
+    logits=tf.reshape(logits,shape=[-1,cfg.DATA.num_class])
     targets = tf.reshape(targets, shape=[-1])
 
     weights=tf.reshape(weights,shape=[-1])

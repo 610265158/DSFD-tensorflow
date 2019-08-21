@@ -7,15 +7,6 @@ from train_config import config as cfg
 
 
 
-
-
-
-
-
-
-
-
-
 class FaceDetector:
     def __init__(self, model_path):
         """
@@ -37,7 +28,7 @@ class FaceDetector:
             ]
 
 
-    def __call__(self, image, score_threshold=0.5,minface=40):
+    def __call__(self, image, score_threshold=0.5):
         """Detect faces.
 
         Arguments:
@@ -45,10 +36,8 @@ class FaceDetector:
                 that represents a RGB image.
             score_threshold: a float number.
         Returns:
-            boxes: a float numpy array of shape [num_faces, 4].
-            scores: a float numpy array of shape [num_faces].
+            boxes: a float numpy array of shape [num_faces, 5].
 
-        Note that box coordinates are in the order: ymin, xmin, ymax, xmax!
         """
 
 

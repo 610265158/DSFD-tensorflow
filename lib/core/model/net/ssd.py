@@ -7,7 +7,6 @@ import numpy as np
 from lib.core.anchor.box_utils import batch_decode
 from lib.core.anchor.nms import batch_non_max_suppression
 
-from lib.core.model.net.efficientnet.backbone import efficient_ssd
 from lib.core.model.net.resnet.backbone import resnet_ssd
 from lib.core.model.net.mobilenet.backbone import mobilenet_ssd
 from lib.core.model.net.vgg.backbone import vgg_ssd
@@ -41,8 +40,6 @@ def SSD(images,boxes,labels,L2_reg,training=True):
         ssd_backbne = resnet_ssd
     elif 'vgg' in cfg.MODEL.net_structure:
         ssd_backbne = vgg_ssd
-    elif 'efficientnet' in cfg.MODEL.net_structure:
-        ssd_backbne= efficient_ssd
     else:
         ssd_backbne=None
         print('a net structure that not supported')
@@ -102,7 +99,10 @@ def SSD(images,boxes,labels,L2_reg,training=True):
     get_predictions(reg_final,cla_final,anchors_)
 
     return reg_loss,cla_loss
-def get_predictions(box_encodings,cla,anchors, score_threshold=0.05, iou_threshold=0.3, max_boxes=1500):
+def get_predictions(box_encodings,cla,anchors, \
+                    score_threshold=cfg.TEST.score_thres, \
+                    iou_threshold=cfg.TEST.iou_thres,\
+                    max_boxes=cfg.TEST.max_detect):
     """Postprocess outputs of the network.
 
     Returns:

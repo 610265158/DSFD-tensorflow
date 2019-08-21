@@ -308,13 +308,10 @@ class DataIter():
 
         self.num_gpu = cfg.TRAIN.num_gpu
         self.batch_size = cfg.TRAIN.batch_size
-        self.thread_num = cfg.TRAIN.thread_num
         self.process_num = cfg.TRAIN.process_num
-        self.buffer_size = cfg.TRAIN.buffer_size
         self.prefetch_size = cfg.TRAIN.prefetch_size
 
         self.generator = DsfdDataIter(img_root_path, ann_file, self.training_flag )
-
 
         self.ds = self.build_iter()
 
@@ -330,7 +327,7 @@ class DataIter():
         ds = DataFromGenerator(self.generator)
 
 
-        if cfg.DATA.MUTISCALE and self.training_flag:
+        if cfg.DATA.mutiscale and self.training_flag:
             ds = MutiScaleBatcher(ds, self.num_gpu * self.batch_size, scale_range=cfg.DATA.scales,
                                   input_size=(cfg.DATA.hin, cfg.DATA.win))
         else:
