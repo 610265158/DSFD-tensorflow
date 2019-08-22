@@ -103,7 +103,7 @@ example `python model_eval/wider.py --model model/detector.pb
 ### visualization
 ![A demo](https://github.com/610265158/DSFD-tensorflow/blob/master/figures/res_screenshot_11.05.2019.png)
 
-(caution: i dont know where the demo picture coms from, if u think it's a tort, i would like to delet it)
+(caution: i dont know where the demo picture comes from, if u think it's a tort, i would like to delete it.)
 
 if u get a trained model, run `python tools/auto_freeze.py`, it will read the checkpoint file in ./model, and produce detector.pb, then
 
