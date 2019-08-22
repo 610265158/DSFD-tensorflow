@@ -8,9 +8,9 @@ A tensorflow implement dsfd, and there is something different with the origin pa
 It‘s a ssd-like object detect framework, but slightly different,
 combines lots of tricks for face detection, such as dual-shot, dense anchor match, FPN,FEM and so on.
 
-Now it is mainly optimised about face detection,and borrows some codes from other repos
+Now it is mainly optimised about face detection,and borrows some codes from other repos.
 
-Ps, the code maybe not that clear, please be patience, and i am still working on it, and forgive me for my poor english :)
+Ps, the code maybe not that clear, please be patience, i am still working on it, and forgive me for my poor english :)
 
 
 The evaluation results are based on vgg with batchsize(2x6),pretrained model can be download from
@@ -18,7 +18,7 @@ The evaluation results are based on vgg with batchsize(2x6),pretrained model can
 + [baidu disk](https://pan.baidu.com/s/1cUqnf9BwUVkCy0iT6EczKA) ( password ty4d )
 + [google drive](https://drive.google.com/drive/folders/1zCeXPdRPG6-4W8fqEl4uRD5ojHbDRH-o)
 
-widerface  val set
+widerface val set
 
 | Easy MAP | Medium MAP | hard MAP |
 | :------: | :------: | :------: |
@@ -64,7 +64,7 @@ release it in the root dir,
 and if u want to check the data when training, u could set vis in train_config.py as True
 
 
-After training, run :
+6. After training, run :
 
 ```python tools/auto_freeze.py```
 
