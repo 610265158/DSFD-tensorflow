@@ -59,12 +59,12 @@ release it in the root dir,
 
 5. then, run:
 
-  `python train.py`
-
+   ```python train.py```
+   
    and if u want to check the data when training, u could set vis in train_config.py as True
 
 
-6. After training, run :
+6. After training, run:
 
    ```python tools/auto_freeze.py```
 
