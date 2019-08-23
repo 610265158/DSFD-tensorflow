@@ -10,7 +10,7 @@ import cv2
 
 
 from  lib.dataset.dataietr import DataIter
-from lib.core.model.net.ssd import SSD
+from lib.core.model.net.ssd import DSFD
 from train_config import config as cfg
 
 from lib.helper.logger import logger
@@ -129,8 +129,8 @@ class trainner():
 
         # Build the portion of the Graph calculating the losses. Note that we will
         # assemble the total_loss using a custom function below.
-
-        reg_loss,cla_loss=SSD(images,boxes,labels, L2_reg, training)
+        ssd=DSFD()
+        reg_loss,cla_loss=ssd.forward(images,boxes,labels, L2_reg, training)
 
         #reg_loss,cla_loss=ssd_loss( reg, cla,boxes,labels)
         regularization_losses = tf.add_n(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES), name='l2_loss')

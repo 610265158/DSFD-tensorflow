@@ -48,6 +48,7 @@ class FaceDetector:
         image_fornet=cv2.resize(image,input_shape)
 
         image_fornet = np.expand_dims(image_fornet, 0)
+        image_fornet=np.concatenate((image_fornet,image_fornet),axis=0)
 
         start = time.time()
         boxes,labels, scores, num_boxes = self._sess.run(
