@@ -39,7 +39,7 @@ class DSFD():
         ### head, regresssion and class
         if cfg.MODEL.dual_mode:
             #### train as a dsfd  , anchor with 1 ratios per pixel ,   two shot
-            logger.info('train with a ssd with fpn ')
+            logger.info('train with dsfd ')
             ###first shot
             origin_reg, origin_cls = self.ssd_head(origin_fms, l2_regulation, training_flag,ratios_per_pixel=1)
             ###second shot
