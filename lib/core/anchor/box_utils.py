@@ -6,7 +6,7 @@ import tensorflow as tf
 import numpy as np
 # a small value
 EPSILON = 1e-8
-SCALE_FACTORS = [10.0, 10.0, 5.0, 5.0]
+SCALE_FACTORS = [5.0, 5.0, 5.0, 5.0]
 
 """
 Tools for dealing with bounding boxes.
@@ -72,51 +72,12 @@ def area(boxes):
     return (ymax - ymin) * (xmax - xmin)
 
 
-def to_minmax_coordinates(boxes):
-    """Convert bounding boxes of the format
-    [cy, cx, h, w] to the format [ymin, xmin, ymax, xmax].
-
-    Arguments:
-        boxes: a list of float tensors with shape [N]
-            that represent cy, cx, h, w.
-    Returns:
-        a list of float tensors with shape [N]
-        that represent ymin, xmin, ymax, xmax.
-    """
-
-    cy, cx, h, w = boxes
-    ymin, xmin = cy - 0.5*h, cx - 0.5*w
-    ymax, xmax = cy + 0.5*h, cx + 0.5*w
-    return [ymin, xmin, ymax, xmax]
-
-
-def to_center_coordinates(boxes):
-    """Convert bounding boxes of the format
-    [ymin, xmin, ymax, xmax] to the format [cy, cx, h, w].
-
-    Arguments:
-        boxes: a list of float tensors with shape [N]
-            that represent ymin, xmin, ymax, xmax.
-    Returns:
-        a list of float tensors with shape [N]
-        that represent cy, cx, h, w.
-    """
-
-    #ymin, xmin, ymax, xmax = boxes
-    xmin, ymin, xmax, ymax = boxes
-    h = ymax - ymin
-    w = xmax - xmin
-    cy = ymin + 0.5 * h
-    cx = xmin + 0.5 * w
-    return [cy, cx, h, w]
-
 
 def encode(boxes, anchors):
 
     # print(boxes)
     # print(anchors)
     """Encode boxes with respect to anchors.
-
     Arguments:
         boxes: a float tensor with shape [N, 4].
         anchors: a float tensor with shape [N, 4].
@@ -125,32 +86,24 @@ def encode(boxes, anchors):
         anchor-encoded boxes of the format [ty, tx, th, tw].
     """
 
-    ycenter_a, xcenter_a, ha, wa = to_center_coordinates([anchors[:,0],anchors[:,1],anchors[:,2],anchors[:,3]])
-    ycenter, xcenter, h, w = to_center_coordinates([boxes[:,0],boxes[:,1],boxes[:,2],boxes[:,3]])
+    anchor_widths = anchors[:, 2] - anchors[:, 0]
+    anchor_heights = anchors[:, 3] - anchors[:, 1]
 
-    # to avoid NaN in division and log below
-    ha += EPSILON
-    wa += EPSILON
-    h += EPSILON
-    w += EPSILON
+    tx1 = (boxes[:, 0] - anchors[:, 0]) / anchor_widths
+    ty1 = (boxes[:, 1] - anchors[:, 1]) / anchor_heights
+    tx2 = (boxes[:, 2] - anchors[:, 2]) / anchor_widths
+    ty2 = (boxes[:, 3] - anchors[:, 3]) / anchor_heights
 
-    tx = (xcenter - xcenter_a) / wa
-    ty = (ycenter - ycenter_a) / ha
-    tw = np.log(w / wa)
-    th = np.log(h / ha)
+    tx1 *= SCALE_FACTORS[0]
+    ty1 *= SCALE_FACTORS[1]
+    tx2 *= SCALE_FACTORS[2]
+    ty2 *= SCALE_FACTORS[3]
 
-    ty *= SCALE_FACTORS[0]
-    tx *= SCALE_FACTORS[1]
-    th *= SCALE_FACTORS[2]
-    tw *= SCALE_FACTORS[3]
-
-    return np.stack([ty, tx, th, tw], axis=1)
-
+    return np.stack([tx1, ty1, tx2, ty2], axis=1)
 
 
 def decode(codes, anchors):
     """Decode relative codes to boxes.
-
     Arguments:
         codes: a float tensor with shape [N, 4],
             anchor-encoded boxes of the format [ty, tx, th, tw].
@@ -161,19 +114,22 @@ def decode(codes, anchors):
     """
     with tf.name_scope('decode_predictions'):
 
-        ycenter_a, xcenter_a, ha, wa = to_center_coordinates(tf.unstack(anchors, axis=1))
-        ty, tx, th, tw = tf.unstack(codes, axis=1)
+        anchor_widths = anchors[:, 2] - anchors[:, 0]
+        anchor_heights = anchors[:, 3] - anchors[:, 1]
 
-        ty /= SCALE_FACTORS[0]
-        tx /= SCALE_FACTORS[1]
-        th /= SCALE_FACTORS[2]
-        tw /= SCALE_FACTORS[3]
-        w = tf.exp(tw) * wa
-        h = tf.exp(th) * ha
-        ycenter = ty * ha + ycenter_a
-        xcenter = tx * wa + xcenter_a
+        tx1, ty1, tx2, ty2 = tf.unstack(codes, axis=1)
 
-        return tf.stack(to_minmax_coordinates([ycenter, xcenter, h, w]), axis=1)
+        tx1 /= SCALE_FACTORS[0]
+        ty1 /= SCALE_FACTORS[1]
+        tx2 /= SCALE_FACTORS[2]
+        ty2 /= SCALE_FACTORS[3]
+
+        x1=tx1*anchor_widths+anchors[:,0]
+        y1=ty1*anchor_heights+anchors[:,1]
+        x2=tx2*anchor_widths+anchors[:,2]
+        y2=ty2*anchor_heights+anchors[:,3]
+
+        return tf.stack([y1,x1,y2,x2], axis=1)
 
 
 def batch_decode(box_encodings, anchors):

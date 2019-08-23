@@ -34,7 +34,7 @@ def preprocess( image):
 def SSD(images,boxes,labels,L2_reg,training=True):
     images=preprocess(images)
 
-    if 'MobilenetV1' in cfg.MODEL.net_structure:
+    if 'MobilenetV2' in cfg.MODEL.net_structure:
         ssd_backbne=mobilenet_ssd
     elif 'resnet' in cfg.MODEL.net_structure:
         ssd_backbne = resnet_ssd
