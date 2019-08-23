@@ -5,11 +5,10 @@ import numpy as np
 import sys
 sys.path.append('.')
 
-from lib.core.anchor.common import np_iou
-from lib.core.anchor.box_utils import encode
+
+from lib.core.anchor.box_utils import encode,np_iou
 
 from train_config import config as cfg
-
 
 
 
