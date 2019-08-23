@@ -27,7 +27,7 @@ def GetFileList(dir, fileList):
 
 def facedetect():
     count = 0
-    data_dir = 'yourdata'
+    data_dir = '/home/lz/下载'
     pics = []
     GetFileList(data_dir,pics)
 

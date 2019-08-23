@@ -37,14 +37,14 @@ class DSFD():
         origin_fms,enhanced_fms=self.backbone(inputs,training_flag,l2_regulation)
 
         ### head, regresssion and class
-        if cfg.MODEL.dual_mode:
+        if cfg.MODEL.dual_mode and cfg.MODEL.fpn:
             #### train as a dsfd  , anchor with 1 ratios per pixel ,   two shot
             logger.info('train with dsfd ')
             ###first shot
             origin_reg, origin_cls = self.ssd_head(origin_fms, l2_regulation, training_flag,ratios_per_pixel=1)
             ###second shot
             with tf.variable_scope('dual'):
-                dual_reg, dual_cls = self.ssd_head(enhanced_fms, l2_regulation, training_flag,ratios_per_pixel=1)
+                final_reg, final_cls = self.ssd_head(enhanced_fms, l2_regulation, training_flag,ratios_per_pixel=1)
 
             ### calculate loss
             if with_loss:
@@ -59,29 +59,29 @@ class DSFD():
                 label_norm = labels[:, 0::2]
                 ## second shot loss
                 with tf.name_scope('dual'):
-                    reg_loss_dual, cls_loss_dual = ssd_loss(dual_reg, dual_cls, boxes_norm, label_norm, 'ohem')
+                    final_reg_loss, final_cls_loss_dual = ssd_loss(final_reg, final_cls, boxes_norm, label_norm, 'ohem')
 
-                reg_loss = (reg_loss + reg_loss_dual)
-                cls_loss = (cls_loss + cls_loss_dual)
+                reg_loss = (reg_loss + final_reg_loss)
+                cls_loss = (cls_loss + final_cls_loss_dual)
 
 
         elif cfg.MODEL.fpn:
             #### train as a plain ssd with fpn  , anchor with 2 ratios per pixel
             logger.info('train with a ssd with fpn ')
             with tf.variable_scope('dual'):
-                reg, cls = self.ssd_head(enhanced_fms, l2_regulation, training_flag,ratios_per_pixel=2)
+                final_reg, final_cls = self.ssd_head(enhanced_fms, l2_regulation, training_flag,ratios_per_pixel=2)
 
             ### calculate loss
             if with_loss:
-                reg_loss, cls_loss = ssd_loss(reg, cls, boxes, labels, 'ohem')
+                reg_loss, cls_loss = ssd_loss(final_reg, final_cls, boxes, labels, 'ohem')
 
         else:
             #### train as a plain ssd , anchor with 2 ratios per pixel
             logger.info('train with a plain ssd')
-            reg, cls = self.ssd_head(origin_fms, l2_regulation, training_flag, ratios_per_pixel=2)
+            final_reg, final_cls = self.ssd_head(origin_fms, l2_regulation, training_flag, ratios_per_pixel=2)
             ### calculate loss
             if with_loss:
-                reg_loss, cls_loss = ssd_loss(reg, cls, boxes, labels, 'ohem')
+                reg_loss, cls_loss = ssd_loss(final_reg, final_cls, boxes, labels, 'ohem')
 
         ###### adjust the anchors to the image shape, but it trains with a fixed h,w
 
@@ -93,7 +93,9 @@ class DSFD():
             anchors_ = anchors_[0::2]
         else:
             anchors_ = anchors_
-        self.postprocess(dual_reg, dual_cls, anchors_)
+
+
+        self.postprocess(final_reg, final_cls, anchors_)
 
 
 
