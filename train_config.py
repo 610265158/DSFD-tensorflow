@@ -5,7 +5,7 @@ import numpy as np
 from easydict import EasyDict as edict
 
 config = edict()
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"          ##if u use muti gpu set them visiable there andithen set config.TRAIN.num_gpu
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"          ##if u use muti gpu set them visiable there and then set config.TRAIN.num_gpu
 
 config.TRAIN = edict()
 
@@ -25,7 +25,7 @@ config.TRAIN.val_set_size=3000                 ###widerface val size
 config.TRAIN.iter_num_per_epoch = config.TRAIN.train_set_size // config.TRAIN.num_gpu // config.TRAIN.batch_size
 config.TRAIN.val_iter=config.TRAIN.val_set_size// config.TRAIN.num_gpu // config.TRAIN.batch_size
 
-config.TRAIN.lr_value_every_step = [0.00001,0.0001,0.0005,0.0001,0.00001,0.000001]        ##warm up i used
+config.TRAIN.lr_value_every_step = [0.00001,0.0001,0.0005,0.0001,0.00001,0.000001]        ##warm up is used
 config.TRAIN.lr_decay_every_step = [500,1000,60000,80000,100000]
 
 config.TRAIN.weight_decay_factor = 5.e-4                  ##l2 regular
@@ -54,8 +54,7 @@ config.DATA.PIXEL_STD = [58., 57., 57.]
 config.DATA.hin = 640  # input size
 config.DATA.win = 640
 config.DATA.max_size=[config.DATA.hin,config.DATA.win]  ##h,w
-config.DATA.cover_small_face=5                          #one of the
-
+config.DATA.cover_small_face=5                          ###cover the small faces
 
 config.DATA.mutiscale=False                #if muti scale set False  then config.DATA.MAX_SIZE will be the inputsize
 config.DATA.scales=(320,640)
@@ -82,7 +81,7 @@ config.ANCHOR.achor=Anchor()
 # # basemodel ---------------------- fddb 0.983
 # config.MODEL = edict()
 # config.MODEL.continue_train=False ### revover from a trained model
-# config.MODEL.model_path = '/media/lz/73abf007-eec4-4097-9344-48d64dc62346/tmp_model'  # save directory
+# config.MODEL.model_path = './model'  # save directory
 # config.MODEL.net_structure='resnet_v1_50'#resnet_v1_50,resnet_v1_101,mobilenet
 # config.MODEL.pretrained_model='resnet_v1_50.ckpt'
 # config.MODEL.fpn_dims=[256,512,1024,2048,512,256]
@@ -97,7 +96,7 @@ config.ANCHOR.achor=Anchor()
 # config.MODEL.fpn_dims=[256,512,1024,2048,512,256]
 # config.MODEL.fem_dims=512
 
-#vgg as basemodel, if vgg set config.TRAIN.norm ='None', achieves fddb 0.987
+#vgg as basemodel. if vgg, set config.TRAIN.norm ='None', achieves fddb 0.987
 config.MODEL = edict()
 config.TRAIN.norm='None'
 config.MODEL.l2_norm=[10,8,5]
@@ -109,7 +108,7 @@ config.MODEL.fpn_dims=[256,512,512,1024,512,256]
 config.MODEL.fem_dims=512
 
 
-# ##mobilenet as basemodel
+# ##mobilenet as basemodel, mobile net is not that fast
 # config.MODEL = edict()
 # config.MODEL.continue_train=False ### revover from a trained model
 # config.MODEL.model_path = './model/'  # save directory
