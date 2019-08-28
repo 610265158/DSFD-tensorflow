@@ -80,7 +80,7 @@ class DSFD():
             #### train as a plain ssd with fpn  , anchor with 2 ratios per pixel
             logger.info('train with a ssd with fpn ')
             with tf.variable_scope('dual'):
-                final_reg, final_cls = self.ssd_head(enhanced_fms, l2_regulation, training_flag,ratios_per_pixel=2)
+                final_reg, final_cls = self.ssd_head(enhanced_fms, l2_regulation, training_flag)
 
             ### calculate loss
             if with_loss:
@@ -89,7 +89,7 @@ class DSFD():
         else:
             #### train as a plain ssd , anchor with 2 ratios per pixel
             logger.info('train with a plain ssd')
-            final_reg, final_cls = self.ssd_head(origin_fms, l2_regulation, training_flag, ratios_per_pixel=2)
+            final_reg, final_cls = self.ssd_head(origin_fms, l2_regulation, training_flag)
             ### calculate loss
             if with_loss:
                 reg_loss, cls_loss = ssd_loss(final_reg, final_cls, boxes, labels, 'ohem')
