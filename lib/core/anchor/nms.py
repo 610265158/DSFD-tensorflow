@@ -17,23 +17,6 @@ def batch_non_max_suppression(
         scores: a float tensor with shape [batch_size, max_boxes].
         num_detections: an int tensor with shape [batch_size].
     """
-
-def batch_non_max_suppression(
-        boxes, scores,labels,
-        score_threshold, iou_threshold,
-        max_boxes):
-    """
-    Arguments:
-        boxes: a float tensor with shape [batch_size, N, 4].
-        scores: a float tensor with shape [batch_size, N].
-        score_threshold: a float number.
-        iou_threshold: a float number, threshold for IoU.
-        max_boxes: an integer, maximum number of retained boxes.
-    Returns:
-        boxes: a float tensor with shape [batch_size, max_boxes, 4].
-        scores: a float tensor with shape [batch_size, max_boxes].
-        num_detections: an int tensor with shape [batch_size].
-    """
     def fn(x):
         boxes, scores,labels = x
 

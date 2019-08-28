@@ -78,7 +78,7 @@ def encode(boxes, anchors):
         anchors: a float tensor with shape [N, 4].
     Returns:
         a float tensor with shape [N, 4],
-        anchor-encoded boxes of the format [ty, tx, th, tw].
+        anchor-encoded boxes of the format [tx1, ty1, tx2, ty2].
     """
 
     anchor_widths = anchors[:, 2] - anchors[:, 0]

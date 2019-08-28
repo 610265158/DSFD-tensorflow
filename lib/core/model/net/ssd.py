@@ -25,7 +25,18 @@ class DSFD():
 
     def __init__(self,):
 
-        self.ssd_head=SSDHead()
+        if 'MobilenetV2' in cfg.MODEL.net_structure:
+            ssd_backbne = mobilenet_ssd
+        elif 'resnet' in cfg.MODEL.net_structure:
+            ssd_backbne = resnet_ssd
+        elif 'vgg' in cfg.MODEL.net_structure:
+            ssd_backbne = vgg_ssd
+        else:
+            ssd_backbne = None
+            logger.error('a net structure that not supported')
+
+        self.ssd_backbone=ssd_backbne                 ### it is a func
+        self.ssd_head=SSDHead()                         ### it is a class
 
 
     def forward(self,inputs,boxes,labels,l2_regulation,training_flag,with_loss=True):
@@ -34,7 +45,7 @@ class DSFD():
         inputs=self.preprocess(inputs)
 
         ### extract feature maps
-        origin_fms,enhanced_fms=self.backbone(inputs,training_flag,l2_regulation)
+        origin_fms,enhanced_fms=self.ssd_backbone(inputs,l2_regulation,training_flag)
 
         ### head, regresssion and class
         if cfg.MODEL.dual_mode and cfg.MODEL.fpn:
@@ -101,25 +112,6 @@ class DSFD():
 
         return reg_loss,cls_loss
 
-
-    def backbone(self,inputs,training_flag,l2_regulation):
-        if 'MobilenetV2' in cfg.MODEL.net_structure:
-            ssd_backbne = mobilenet_ssd
-        elif 'resnet' in cfg.MODEL.net_structure:
-            ssd_backbne = resnet_ssd
-        elif 'vgg' in cfg.MODEL.net_structure:
-            ssd_backbne = vgg_ssd
-        else:
-            ssd_backbne = None
-            logger.error('a net structure that not supported')
-
-        origin_fms,enhanced_fms = ssd_backbne(inputs, l2_regulation, training_flag)
-
-
-        return origin_fms,enhanced_fms
-
-
-
     def preprocess(self,image):
         with tf.name_scope('image_preprocess'):
             if image.dtype.base_dtype != tf.float32:
@@ -133,7 +125,6 @@ class DSFD():
             image = (image - image_mean) * image_invstd  ###imagenet preprocess just centered the data
 
         return image
-
 
     def postprocess(self,box_encodings,cla,anchors, \
                         score_threshold=cfg.TEST.score_thres, \
