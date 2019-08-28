@@ -11,6 +11,7 @@ combines lots of tricks for face detection, such as dual-shot, dense anchor matc
 Now it is mainly optimised about face detection,and borrows some codes from other repos.
 
 Ps, the code maybe not that clear, please be patience, i am still working on it, and forgive me for my poor english :)
+** contact me if u have question 2120140200@mail.nankai.edu.cn **
 
 
 The evaluation results are based on vgg with batchsize(2x6),pretrained model can be download from
