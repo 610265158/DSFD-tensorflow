@@ -18,7 +18,7 @@ Ps, the code maybe not that clear, please be patience, i am still working on it,
 The evaluation results are based on vgg with batchsize(2x6),pretrained model can be download from
 
 + [baidu disk](https://pan.baidu.com/s/1cUqnf9BwUVkCy0iT6EczKA) ( password ty4d )
-+ [google drive](https://drive.google.com/drive/folders/1zCeXPdRPG6-4W8fqEl4uRD5ojHbDRH-o)
++ [google drive](https://drive.google.com/open?id=1zCeXPdRPG6-4W8fqEl4uRD5ojHbDRH-o)
 
 widerface val set
 
