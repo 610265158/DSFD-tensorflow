@@ -7,8 +7,10 @@
 from lib.helper.logger import logger
 from lib.core.base_trainer.net_work import Train
 from lib.dataset.dataietr import DataIter
-from lib.core.model.dsfd import DSFD
 
+
+from lib.core.model.shufflenet.dsfd import DSFD as shufflenet_dsfd
+from lib.core.model.vgg.dsfd import DSFD as vgg_dsfd
 import tensorflow as tf
 import cv2
 import numpy as np
@@ -43,7 +45,7 @@ def main():
 
     strategy = tf.distribute.MirroredStrategy(devices)
     with strategy.scope():
-        model=DSFD()
+        model=vgg_dsfd()
 
         ###run a time to build the model
         image = np.zeros(shape=(1, 512, 512, 3), dtype=np.float32)

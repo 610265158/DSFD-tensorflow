@@ -91,7 +91,6 @@ class Train(object):
 
     ## add l2
     l2_loss=self.weight_decay_loss()
-    print('yyyyyyyyy',l2_loss)
     loss += (l2_loss * 1. / self.strategy.num_replicas_in_sync)
     return loss
 

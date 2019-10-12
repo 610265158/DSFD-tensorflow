@@ -255,13 +255,13 @@ class MaxOut(tf.keras.Model):
 
         return cls_pre
 
-class SsdHead(tf.keras.Model):
+class SSDHead(tf.keras.Model):
     def __init__(self,
                  ratio_per_pixel=None,
                  fm_levels=6,
                  kernel_initializer='glorot_normal'
                  ):
-        super(SsdHead, self).__init__()
+        super(SSDHead, self).__init__()
         if ratio_per_pixel is None:
             self.num_predict_per_level = len(cfg.ANCHOR.ANCHOR_RATIOS)
         else:
@@ -354,9 +354,9 @@ class DSFD(tf.keras.Model):
                       for i in range(len(cfg.MODEL.fpn_dims))]
 
         if cfg.MODEL.dual_mode:
-            self.ssd_head_origin=SsdHead(ratio_per_pixel=1,kernel_initializer=kernel_initializer)
+            self.ssd_head_origin=SSDHead(ratio_per_pixel=1,kernel_initializer=kernel_initializer)
 
-            self.ssd_head_fem = SsdHead(ratio_per_pixel=1,kernel_initializer=kernel_initializer)
+            self.ssd_head_fem = SSDHead(ratio_per_pixel=1,kernel_initializer=kernel_initializer)
 
     def call(self,images,training):
 
@@ -386,9 +386,22 @@ class DSFD(tf.keras.Model):
 
 
     @tf.function(input_signature=[tf.TensorSpec([None, None, None, 3], tf.float32)])
-    def inference(self,images):
-        o_reg,o_cls,fpn_reg,fpn_cls=self.call(images,training=False)
+    def inference(self, images, training=False):
 
+        x = self.preprocess(images)
+
+        net, end_points = self.base_model(x, training=training)
+
+        fms = [end_points['block0'],
+               end_points['block1'],
+               end_points['block2'],
+               end_points['block3'],
+               end_points['block4'],
+               end_points['block5']]
+
+        fpn_fms = self.fpn(fms, training=training)
+
+        fpn_reg, fpn_cls = self.ssd_head_fem(fpn_fms, training=training)
 
         ###get anchor
         ###### adjust the anchors to the image shape, but it trains with a fixed h,w
@@ -402,7 +415,7 @@ class DSFD(tf.keras.Model):
         else:
             anchors_ = anchors_
 
-        res=self.postprocess(fpn_reg, fpn_cls, anchors_)
+        res = self.postprocess(fpn_reg, fpn_cls, anchors_)
         return res
 
 
