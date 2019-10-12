@@ -125,7 +125,7 @@ class Train(object):
 
     o_reg, o_cls, fpn_reg, fpn_cls = self.model(image, training=True)
 
-    unscaled_test_loss = self.compute_loss( o_reg,o_cls,fpn_reg,fpn_cls,image, reg_target,matches)
+    unscaled_test_loss = self.compute_loss( o_reg,o_cls,fpn_reg,fpn_cls, reg_target,matches)
 
     return unscaled_test_loss
 
