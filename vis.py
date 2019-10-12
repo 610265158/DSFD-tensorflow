@@ -1,16 +1,13 @@
 import cv2
 import os
 import time
-
-import tensorflow as tf
+import argparse
 
 from lib.core.api.face_detector import FaceDetector
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-detector = FaceDetector(['./model/detector.pb'])
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-
-
+import os
 def GetFileList(dir, fileList):
     newDir = dir
     if os.path.isfile(dir):
@@ -24,10 +21,11 @@ def GetFileList(dir, fileList):
     return fileList
 
 
-def facedetect():
+def image_demo(data_dir):
+    args.model
+    detector = FaceDetector(args.model)
+
     count = 0
-    data_dir = 'yourdatadir'
-    data_dir = '/home/lz/下载'
     pics = []
     GetFileList(data_dir,pics)
 
@@ -56,6 +54,7 @@ def facedetect():
 
             bbox = boxes[box_index]
 
+
             cv2.rectangle(img_show, (int(bbox[0]), int(bbox[1])),
                           (int(bbox[2]), int(bbox[3])), (255, 0, 0), 4)
             # cv2.putText(img_show, str(bbox[4]), (int(bbox[0]), int(bbox[1]) + 30),
@@ -72,6 +71,53 @@ def facedetect():
         cv2.waitKey(0)
     print(count)
 
+def video_demo(cam_id):
+
+    weights = args.model
+    detector = FaceDetector(weights)
+
+
+    vide_capture = cv2.VideoCapture(cam_id)
+
+    while 1:
+
+        ret, img = vide_capture.read()
+        img_show = img.copy()
+
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        boxes = detector(img, 0.5)
+
+        for box_index in range(boxes.shape[0]):
+            bbox = boxes[box_index]
+
+            cv2.rectangle(img_show, (int(bbox[0]), int(bbox[1])),
+                          (int(bbox[2]), int(bbox[3])), (255, 0, 0), 4)
+
+        cv2.namedWindow('res', 0)
+        cv2.imshow('res', img_show)
+        key=cv2.waitKey(1)
+
+        if key==ord('q'):
+            break
+
 
 if __name__=='__main__':
-    facedetect()
+    parser = argparse.ArgumentParser(description='Start train.')
+
+    parser.add_argument('--model', dest='model', type=str, default=None, \
+                        help='the model to use')
+    parser.add_argument('--img_dir', dest='img_dir', type=str,default=None, \
+                        help='the num of the classes (default: 100)')
+    parser.add_argument('--cam_id', dest='cam_id', type=int,default=0, \
+                        help='the camre to use')
+
+    args = parser.parse_args()
+
+
+
+    if args.img_dir is not None:
+
+        image_demo(args.img_dir)
+    else:
+        video_demo(args.cam_id)

@@ -13,19 +13,7 @@ class FaceDetector:
         Arguments:
             model_path: a string, path to a pb file.
         """
-        self._graph = tf.Graph()
-
-        with self._graph.as_default():
-            self._graph, self._sess = self.init_model(model_path)
-
-            self.input_image = tf.get_default_graph().get_tensor_by_name('tower_0/images:0')
-            self.training = tf.get_default_graph().get_tensor_by_name('training_flag:0')
-            self.output_ops = [
-                tf.get_default_graph().get_tensor_by_name('tower_0/boxes:0'),
-                tf.get_default_graph().get_tensor_by_name('tower_0/labels:0'),
-                tf.get_default_graph().get_tensor_by_name('tower_0/scores:0'),
-                tf.get_default_graph().get_tensor_by_name('tower_0/num_detections:0'),
-            ]
+        self.model=tf.saved_model.load(model_path)
 
 
     def __call__(self, image, score_threshold=0.5):
@@ -51,9 +39,14 @@ class FaceDetector:
         image_fornet=np.concatenate((image_fornet,image_fornet),axis=0)
 
         start = time.time()
-        boxes,labels, scores, num_boxes = self._sess.run(
-            self.output_ops, feed_dict={self.input_image: image_fornet,self.training:False}
-        )
+        res = self.model.inference(image_fornet)
+
+        print('xx', time.time() - start)
+        boxes = res['boxes'].numpy()
+        scores = res['scores'].numpy()
+        labels = res['labels'].numpy()
+        num_boxes = res['num_boxes'].numpy()
+
         num_boxes = num_boxes[0]
         boxes = boxes[0][:num_boxes]
         labels = labels[0][:num_boxes]

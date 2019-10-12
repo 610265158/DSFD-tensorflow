@@ -474,7 +474,7 @@ class DSFD(tf.keras.Model):
         labels = tf.identity(labels, name='labels')
         num_detections = tf.identity(num_detections, name='num_detections')
 
-        return {'boxes': boxes, 'scores': scores, 'num_boxes': num_detections}
+        return {'boxes': boxes, 'scores': scores, 'labels':labels,'num_boxes': num_detections}
 
 
 if __name__=='__main__':
