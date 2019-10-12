@@ -122,7 +122,7 @@ class MutiScaleBatcher(BatchData):
 
 
 
-                yield BatchData._aggregate_batch(target, self.use_list)
+                yield BatchData.aggregate_batch(target, self.use_list)
                 del holder[:]
 
         if self.remainder and len(holder) > 0:
