@@ -272,12 +272,13 @@ class SSDHead(tf.keras.Model):
                                                 ) for i in range(fm_levels)]
 
         if cfg.MODEL.maxout:
-            self.conv_cls = [tf.keras.layers.Conv2D(filters=self.num_predict_per_level * cfg.DATA.num_class,
-                                                    kernel_size=(3, 3),
-                                                    padding='same',
-                                                    kernel_initializer=kernel_initializer
-                                                    ) for i in range(fm_levels-1)]
-            self.conv_cls.insert(0,MaxOut(ratio_per_pixel=self.num_predict_per_level))
+            self.conv_cls = [MaxOut(ratio_per_pixel=self.num_predict_per_level)]
+
+            self.conv_cls += [tf.keras.layers.Conv2D(filters=self.num_predict_per_level * cfg.DATA.num_class,
+                                                     kernel_size=(3, 3),
+                                                     padding='same',
+                                                     kernel_initializer=kernel_initializer
+                                                     ) for i in range(fm_levels - 1)]
         else:
             self.conv_cls = [
                 tf.keras.layers.Conv2D(filters=self.num_predict_per_level * cfg.DATA.num_class,
