@@ -275,7 +275,7 @@ class Anchor():
         self.anchors = self.produce_anchors()
 
 if __name__=='__main__':
-    ##model_eval the  anchor codes there
+
     import cv2
 
     cell_anchor = CellAnchor.generate_cell_anchor()

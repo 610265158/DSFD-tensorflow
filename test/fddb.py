@@ -12,11 +12,11 @@ from lib.core.api.face_detector import FaceDetector
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 ap = argparse.ArgumentParser()
-ap.add_argument( "--model", required=False, default='./model/detector.pb', help="model to eval:")
+ap.add_argument( "--model", required=True, default='./model/detector', help="model to eval:")
 ap.add_argument( "--is_show", required=False, default=False, help="show result or not?")
-ap.add_argument( "--data_dir", required=True, default="./FDDB/img", help="dir to img")
-ap.add_argument( "--split_dir", required=True,default='./FDDB/FDDB-folds',help="dir to FDDB-folds")
-ap.add_argument( "--result", required=True,default='./result',help="dir to write result")
+ap.add_argument( "--data_dir", required=False, default="./FDDB/img", help="dir to img")
+ap.add_argument( "--split_dir", required=False,default='./FDDB/FDDB-folds',help="dir to FDDB-folds")
+ap.add_argument( "--result", required=False,default='./result',help="dir to write result")
 args = ap.parse_args()
 
 
@@ -25,7 +25,7 @@ ANNOTATIONS_PATH = args.split_dir
 RESULT_DIR = args.result
 MODEL_PATH = args.model
 
-face_detector = FaceDetector([MODEL_PATH])
+face_detector = FaceDetector(MODEL_PATH)
 
 
 annotations = [s for s in os.listdir(ANNOTATIONS_PATH) if s.endswith('ellipseList.txt')]

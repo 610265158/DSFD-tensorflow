@@ -638,7 +638,7 @@ if __name__=='__main__':
     from lib.dataset.augmentor.visual_augmentation import ColorDistort
     color_aug=ColorDistort()
     for i in range(1000):
-        image=cv2.imread('./lib/dataset/augmentor/model_eval.jpg')
+        image=cv2.imread('./lib/dataset/augmentor/test.jpg')
         boxes = np.array([[165, 60, 233, 138,1]],dtype=np.float)
         #bboxes=np.array([[165,60,233,138],[100,60,233,138]])
 
