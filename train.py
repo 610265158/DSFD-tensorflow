@@ -20,7 +20,7 @@ import setproctitle
 
 logger.info('The trainer start')
 
-setproctitle.setproctitle("faceboxes")
+setproctitle.setproctitle("dsfd")
 
 def main():
 
@@ -41,7 +41,7 @@ def main():
             # Memory growth must be set before GPUs have been initialized
             print(e)
 
-    devices = ['/device:CPU:{}'.format(i) for i in range(cfg.TRAIN.num_gpu)]
+    devices = ['/device:GPU:{}'.format(i) for i in range(cfg.TRAIN.num_gpu)]
 
     strategy = tf.distribute.MirroredStrategy(devices)
     with strategy.scope():
