@@ -253,7 +253,10 @@ class DSFD(tf.keras.Model):
     def __init__(self,kernel_initializer='glorot_normal'):
         super(DSFD, self).__init__()
 
-        self.base_model = Shufflenet(model_size='0.5',
+
+        
+        model_size=cfg.MODEL.net_structure.split('_',1)[-1]
+        self.base_model = Shufflenet(model_size=model_size,
                                      kernel_initializer=kernel_initializer)
 
 

@@ -22,7 +22,7 @@ def GetFileList(dir, fileList):
 
 
 def image_demo(data_dir):
-    args.model
+
     detector = FaceDetector(args.model)
 
     count = 0
@@ -73,9 +73,7 @@ def image_demo(data_dir):
 
 def video_demo(cam_id):
 
-    weights = args.model
-    detector = FaceDetector(weights)
-
+    detector = FaceDetector(args.model)
 
     vide_capture = cv2.VideoCapture(cam_id)
 

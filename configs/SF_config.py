@@ -27,7 +27,7 @@ config.ANCHOR.super_match=True
 
 
 config.MODEL = edict()
-config.MODEL.net_structure='shufflenet'
+config.MODEL.net_structure='ShuffleNetV2_0.5'
 config.MODEL.model_path = './model/'  # save directory
 config.MODEL.pretrained_model=None#'vgg_16.ckpt'
 config.MODEL.fpn_dims=[96,96,96,96,96]
