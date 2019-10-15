@@ -169,19 +169,18 @@ class Shufflenet(tf.keras.Model):
 
 
         self.block1=ShufflenetBlock(self.initial_depth,
-                                     repeat=4,
+                                     repeat=2,
                                      kernel_initializer=kernel_initializer)
         self.block2=ShufflenetBlock(self.initial_depth * 2,
-                                     repeat=4,
+                                     repeat=2,
                                      kernel_initializer=kernel_initializer)
         self.block3=ShufflenetBlock(self.initial_depth * 2 ,
                                      repeat=4,
                                      kernel_initializer=kernel_initializer)
-        self.block4 = ShufflenetBlock(self.initial_depth * 2 ,
+        self.block4 = ShufflenetBlock(self.initial_depth * 2* 2 ,
                                       repeat=4,
                                       kernel_initializer=kernel_initializer)
-
-        self.block5 = ShufflenetBlock(self.initial_depth * 2,
+        self.block5 = ShufflenetBlock(self.initial_depth * 2* 2,
                                       repeat=4,
                                       kernel_initializer=kernel_initializer)
 

@@ -297,12 +297,17 @@ class DSFD(tf.keras.Model):
         return o_reg,o_cls,fpn_reg,fpn_cls
 
 
-    @tf.function(input_signature=[tf.TensorSpec([None, None, None, 3], tf.float32)])
-    def inference(self,images,training=False):
+    @tf.function(input_signature=[tf.TensorSpec([None, None, None, 3], tf.float32),
+                                  tf.TensorSpec(None, tf.float32),
+                                  tf.TensorSpec(None, tf.float32)
+                                  ])
+    def inference(self, images,
+                        score_threshold=cfg.TEST.score_thres, \
+                        iou_threshold=cfg.TEST.iou_thres):
 
         x = self.preprocess(images)
 
-        net, end_points = self.base_model(x, training=training)
+        net, end_points = self.base_model(x, training=False)
 
         fms = [#end_points['block0'],
                end_points['block1'],
@@ -312,7 +317,7 @@ class DSFD(tf.keras.Model):
                end_points['block5']]
 
 
-        fpn_reg, fpn_cls = self.ssd_head_fem(fms, training=training)
+        fpn_reg, fpn_cls = self.ssd_head_fem(fms, training=False)
 
         ###get anchor
         ###### adjust the anchors to the image shape, but it trains with a fixed h,w
@@ -327,7 +332,7 @@ class DSFD(tf.keras.Model):
         else:
             anchors_ = anchors_
 
-        res=self.postprocess(fpn_reg, fpn_cls, anchors_)
+        res=self.postprocess(fpn_reg, fpn_cls, anchors_,score_threshold,iou_threshold)
         return res
 
 
@@ -360,14 +365,10 @@ class DSFD(tf.keras.Model):
         """
         with tf.name_scope('postprocessing'):
             boxes = batch_decode(box_encodings, anchors)
-            # if the images were padded we need to rescale predicted boxes:
 
-            boxes = tf.clip_by_value(boxes, 0.0, 1.0)
             # it has shape [batch_size, num_anchors, 4]
-            if 0:
-                scores = tf.nn.sigmoid(cla)[:, :, 1:]  ##ignore the bg
-            else:
-                scores = tf.nn.softmax(cla, axis=2)[:, :, 1:]  ##ignore the bg
+
+            scores = tf.nn.softmax(cla, axis=2)[:, :, 1:]  ##ignore the bg
             # it has shape [batch_size, num_anchors,class]
             labels = tf.argmax(scores,axis=2)
             # it has shape [batch_size, num_anchors]
@@ -381,9 +382,7 @@ class DSFD(tf.keras.Model):
                 boxes, scores,labels, score_threshold, iou_threshold, max_boxes
             )
 
-        boxes=tf.identity(boxes,name='boxes')
-        scores = tf.identity(scores, name='scores')
-        labels = tf.identity(labels, name='labels')
+
         num_detections = tf.identity(num_detections, name='num_detections')
 
         return {'boxes': boxes, 'scores': scores,'labels':labels, 'num_boxes': num_detections}
@@ -399,9 +398,9 @@ if __name__=='__main__':
 
     image = np.zeros(shape=(1, 320, 320, 3), dtype=np.float32)
 
-    model.inference(image)
+    model.inference(image,0.5,0.3)
 
     start = time.time()
     for i in range(100):
-        model.inference(image)
+        model.inference(image,0.5,0.3)
     print('xxxyyy', (time.time() - start) / 100.)
