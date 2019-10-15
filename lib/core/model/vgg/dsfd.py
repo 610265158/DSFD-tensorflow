@@ -1,8 +1,6 @@
 import sys
 sys.path.append('.')
 
-from tensorflow_core.python.keras.applications.vgg16 import VGG16
-from tensorflow_core.python.keras.models import Model
 import tensorflow as tf
 import numpy as np
 
@@ -364,9 +362,6 @@ class DSFD(tf.keras.Model):
 
         vgg_fms=self.base_model(x,training=training)
 
-        shapes = [y.shape for y in vgg_fms]
-        print(shapes)
-
         fpn_fms=self.fpn(vgg_fms,training=training)
 
         fpn_fms[0] = l2_normalization(fpn_fms[0], scale=cfg.MODEL.l2_norm[0])
@@ -390,16 +385,13 @@ class DSFD(tf.keras.Model):
 
         x = self.preprocess(images)
 
-        net, end_points = self.base_model(x, training=training)
+        vgg_fms = self.base_model(x, training=training)
 
-        fms = [end_points['block0'],
-               end_points['block1'],
-               end_points['block2'],
-               end_points['block3'],
-               end_points['block4'],
-               end_points['block5']]
+        fpn_fms = self.fpn(vgg_fms, training=training)
 
-        fpn_fms = self.fpn(fms, training=training)
+        fpn_fms[0] = l2_normalization(fpn_fms[0], scale=cfg.MODEL.l2_norm[0])
+        fpn_fms[1] = l2_normalization(fpn_fms[1], scale=cfg.MODEL.l2_norm[1])
+        fpn_fms[2] = l2_normalization(fpn_fms[2], scale=cfg.MODEL.l2_norm[2])
 
         fpn_reg, fpn_cls = self.ssd_head_fem(fpn_fms, training=training)
 
@@ -479,12 +471,16 @@ class DSFD(tf.keras.Model):
 
 if __name__=='__main__':
 
-
-
     ##teset codes for dsfd models
+    import time
 
-    dsfd=DSFD()
+    model = DSFD()
 
-    image=np.zeros(shape=[2,320,320,3],dtype=np.float32)
+    image = np.zeros(shape=(1, 320, 320, 3), dtype=np.float32)
 
-    dsfd(image,training=True)
+    model.inference(image)
+
+    start = time.time()
+    for i in range(100):
+        model.inference(image)
+    print('xxxyyy', (time.time() - start) / 100.)

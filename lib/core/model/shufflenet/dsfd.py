@@ -256,18 +256,17 @@ class DSFD(tf.keras.Model):
         self.base_model = Shufflenet(model_size='0.5',
                                      kernel_initializer=kernel_initializer)
 
-        self.fpn=Fpn(kernel_initializer=kernel_initializer)
 
-        # self.cpm_ops=[CPM(kernel_initializer=kernel_initializer)
-        #               for i in range(len(cfg.MODEL.fpn_dims))]
+
+
 
         if cfg.MODEL.dual_mode:
             self.ssd_head_origin=SSDHead(ratio_per_pixel=1,
-                                         fm_levels=6,
+                                         fm_levels=5,
                                          kernel_initializer=kernel_initializer)
 
             self.ssd_head_fem = SSDHead(ratio_per_pixel=1,
-                                        fm_levels=6,
+                                        fm_levels=5,
                                         kernel_initializer=kernel_initializer)
 
     def call(self,images,training):
@@ -277,25 +276,20 @@ class DSFD(tf.keras.Model):
         net,end_points=self.base_model(x,training=training)
 
 
-        fms=[end_points['block0'],
+        fms=[#end_points['block0'],
              end_points['block1'],
              end_points['block2'],
              end_points['block3'],
              end_points['block4'],
              end_points['block5']]
 
-        shapes = [y.shape for y in fms]
-        print(shapes)
+        # shapes = [y.shape for y in fms]
+        # print(shapes)
 
-        fpn_fms=self.fpn(fms,training=training)
-
-
-        # for i in  range(len(fpn_fms)):
-        #     fpn_fms[i]=self.cpm_ops[i](fpn_fms[i],training=training)
 
         o_reg,o_cls=self.ssd_head_origin(fms,training=training)
 
-        fpn_reg,fpn_cls=self.ssd_head_fem(fpn_fms,training=training)
+        fpn_reg,fpn_cls=self.ssd_head_fem(fms,training=training)
 
         return o_reg,o_cls,fpn_reg,fpn_cls
 
@@ -307,16 +301,15 @@ class DSFD(tf.keras.Model):
 
         net, end_points = self.base_model(x, training=training)
 
-        fms = [end_points['block0'],
+        fms = [#end_points['block0'],
                end_points['block1'],
                end_points['block2'],
                end_points['block3'],
                end_points['block4'],
                end_points['block5']]
 
-        fpn_fms = self.fpn(fms, training=training)
 
-        fpn_reg, fpn_cls = self.ssd_head_fem(fpn_fms, training=training)
+        fpn_reg, fpn_cls = self.ssd_head_fem(fms, training=training)
 
         ###get anchor
         ###### adjust the anchors to the image shape, but it trains with a fixed h,w
@@ -324,7 +317,6 @@ class DSFD(tf.keras.Model):
         h = tf.shape(images)[1]
         w = tf.shape(images)[2]
         anchors_ = get_all_anchors_fpn(max_size=[h, w])
-
 
 
         if cfg.MODEL.dual_mode:
@@ -399,9 +391,14 @@ if __name__=='__main__':
 
 
     ##teset codes for dsfd models
+    import time
+    model=DSFD()
 
-    dsfd=DSFD()
+    image = np.zeros(shape=(1, 240, 320, 3), dtype=np.float32)
 
-    image=np.zeros(shape=[2,320,320,3],dtype=np.float32)
+    model.inference(image)
 
-    dsfd(image,training=True)
+    start = time.time()
+    for i in range(100):
+        model.inference(image)
+    print('xxxyyy', (time.time() - start) / 100.)

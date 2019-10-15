@@ -45,7 +45,11 @@ def main():
 
     strategy = tf.distribute.MirroredStrategy(devices)
     with strategy.scope():
-        model=vgg_dsfd()
+
+        if 'vgg' in cfg.MODEL.net_structure:
+            model=vgg_dsfd()
+        elif 'shuffle' in cfg.MODEL.net_structure:
+            model = shufflenet_dsfd()
 
         ###run a time to build the model
         image = np.zeros(shape=(1, 512, 512, 3), dtype=np.float32)
