@@ -26,7 +26,7 @@ class CPM(tf.keras.Model):
     def __init__(self,kernel_initializer='glorot_normal'):
         super(CPM, self).__init__()
 
-        dim = cfg.MODEL.fem_dims
+        dim = cfg.MODEL.cpm_dims
 
         self.conv_1_1=tf.keras.layers.Conv2D(filters=dim//2,
                                              kernel_size=(3,3),
@@ -347,10 +347,15 @@ class DSFD(tf.keras.Model):
 
         self.base_model = VGG(kernel_initializer=kernel_initializer)
 
-        self.fpn=Fpn(kernel_initializer=kernel_initializer)
 
-        self.cpm_ops=[CPM(kernel_initializer=kernel_initializer)
-                      for i in range(len(cfg.MODEL.fpn_dims))]
+
+
+
+        if cfg.MODEL.fpn:
+            self.fpn=Fpn(kernel_initializer=kernel_initializer)
+        if cfg.MODEL.cpm:
+            self.cpm_ops=[CPM(kernel_initializer=kernel_initializer)
+                          for i in range(len(cfg.MODEL.fpn_dims))]
 
         if cfg.MODEL.dual_mode:
             self.ssd_head_origin=SSDHead(ratio_per_pixel=1,kernel_initializer=kernel_initializer)
@@ -362,15 +367,16 @@ class DSFD(tf.keras.Model):
         x=self.preprocess(images)
 
         vgg_fms=self.base_model(x,training=training)
-
-        fpn_fms=self.fpn(vgg_fms,training=training)
+        if cfg.MODEL.fpn:
+            fpn_fms=self.fpn(vgg_fms,training=training)
 
         fpn_fms[0] = l2_normalization(fpn_fms[0], scale=cfg.MODEL.l2_norm[0])
         fpn_fms[1] = l2_normalization(fpn_fms[1], scale=cfg.MODEL.l2_norm[1])
         fpn_fms[2] = l2_normalization(fpn_fms[2], scale=cfg.MODEL.l2_norm[2])
 
-        for i in  range(len(fpn_fms)):
-            fpn_fms[i]=self.cpm_ops[i](fpn_fms[i],training=training)
+        if cfg.MODEL.cpm:
+            for i in  range(len(fpn_fms)):
+                fpn_fms[i]=self.cpm_ops[i](fpn_fms[i],training=training)
 
         o_reg,o_cls=self.ssd_head_origin(vgg_fms,training=training)
 
@@ -387,8 +393,8 @@ class DSFD(tf.keras.Model):
         x = self.preprocess(images)
 
         vgg_fms = self.base_model(x, training=training)
-
-        fpn_fms = self.fpn(vgg_fms, training=training)
+        if cfg.MODEL.fpn:
+            fpn_fms = self.fpn(vgg_fms, training=training)
 
         fpn_fms[0] = l2_normalization(fpn_fms[0], scale=cfg.MODEL.l2_norm[0])
         fpn_fms[1] = l2_normalization(fpn_fms[1], scale=cfg.MODEL.l2_norm[1])
@@ -472,7 +478,7 @@ class DSFD(tf.keras.Model):
 
 if __name__=='__main__':
 
-    ##teset codes for dsfd models
+    ##test codes for dsfd models
     import time
 
     model = DSFD()

@@ -31,9 +31,10 @@ config.MODEL.net_structure='ShuffleNetV2_0.5'
 config.MODEL.model_path = './model/'  # save directory
 config.MODEL.pretrained_model=None#'vgg_16.ckpt'
 config.MODEL.fpn_dims=[96,96,96,96,96]
-config.MODEL.fem_dims=96
+config.MODEL.cpm_dims=128
 
-config.MODEL.fpn=False
+config.MODEL.fpn=True
+config.MODEL.cpm=True
 config.MODEL.dual_mode=True
 config.MODEL.maxout=False
 config.MODEL.max_negatives_per_positive= 3.0

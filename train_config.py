@@ -9,18 +9,21 @@ from configs.SF_config import config as shufflenet_config
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"          ##if u use muti gpu set them visiable there and then set config.TRAIN.num_gpu
 
 
-
+##### the config for different backbone
 config=shufflenet_config
 
 
+
+
+###below are the config params generally used by training
 config.TRAIN = edict()
 
 #### below are params for dataiter
-config.TRAIN.process_num = 2                      ### process_num for data provider
+config.TRAIN.process_num = 5                      ### process_num for data provider
 config.TRAIN.prefetch_size = 10                  ### prefect Q size for data provider
 
 config.TRAIN.num_gpu = 1                         ##match with   os.environ["CUDA_VISIBLE_DEVICES"]
-config.TRAIN.batch_size = 8                    ###A big batch size may achieve a better result, but the memory is a problem
+config.TRAIN.batch_size = 32                    ###A big batch size may achieve a better result, but the memory is a problem
 config.TRAIN.log_interval = 1
 config.TRAIN.epoch = 300                      ###just keep training , evaluation shoule be take care by yourself,
                                                ### generally 10,0000 iters is enough
@@ -54,7 +57,7 @@ config.DATA.PIXEL_STD = [58., 57., 57.]
 config.DATA.hin = 320  # input size
 config.DATA.win = 320
 config.DATA.max_size=[config.DATA.hin,config.DATA.win]  ##h,w
-config.DATA.cover_small_face=5                          ###cover the small faces
+config.DATA.cover_small_face=15                          ###cover the small faces
 
 config.DATA.mutiscale=False                #if muti scale set False  then config.DATA.MAX_SIZE will be the inputsize
 config.DATA.scales=(320,640)

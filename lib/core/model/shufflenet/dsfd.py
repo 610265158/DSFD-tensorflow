@@ -18,58 +18,65 @@ def l2_normalization(x, scale):
     return x
 
 
+def batch_norm():
+    return tf.keras.layers.BatchNormalization(fused=True,momentum=0.997,epsilon=1e-5)
+
 class CPM(tf.keras.Model):
     def __init__(self,kernel_initializer='glorot_normal'):
         super(CPM, self).__init__()
 
-        dim = cfg.MODEL.fem_dims
+        dim = cfg.MODEL.cpm_dims
 
-        self.conv_1_1=tf.keras.layers.Conv2D(filters=dim//2,
+        self.conv_1_1=tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//2,
                                              kernel_size=(3,3),
-                                             dilation_rate=1,
                                              padding='same',
-                                             kernel_initializer=kernel_initializer
-                                             )
+                                             kernel_initializer=kernel_initializer),
+                                           batch_norm(),
+                                           tf.keras.layers.ReLU()])
 
 
-        self.conv_2_1 = tf.keras.layers.Conv2D(filters=dim // 2,
-                                               kernel_size=(3, 3),
-                                               dilation_rate=2,
-                                               padding='same',
-                                               kernel_initializer=kernel_initializer
-                                               )
-        self.conv_2_2 = tf.keras.layers.Conv2D(filters=dim // 4,
-                                               kernel_size=(3, 3),
-                                               dilation_rate=1,
-                                               padding='same',
-                                               kernel_initializer=kernel_initializer
-                                               )
+
+        self.conv_2_1 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//2,
+                                             kernel_size=(3,3),
+                                             padding='same',
+                                             kernel_initializer=kernel_initializer),
+                                             batch_norm(),
+                                             tf.keras.layers.ReLU()])
+
+        self.conv_2_2 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
+                                             kernel_size=(3,3),
+                                             padding='same',
+                                             kernel_initializer=kernel_initializer),
+                                             batch_norm(),
+                                             tf.keras.layers.ReLU()])
 
 
-        self.conv_3_1 = tf.keras.layers.Conv2D(filters=dim // 4,
-                                               kernel_size=(3, 3),
-                                               dilation_rate=2,
-                                               padding='same',
-                                               kernel_initializer=kernel_initializer
-                                               )
-        self.conv_3_2 = tf.keras.layers.Conv2D(filters=dim // 4,
-                                               kernel_size=(3, 3),
-                                               dilation_rate=1,
-                                               padding='same',
-                                               kernel_initializer=kernel_initializer
-                                               )
+        self.conv_3_1 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
+                                             kernel_size=(3,3),
+                                             padding='same',
+                                             kernel_initializer=kernel_initializer),
+                                             batch_norm(),
+                                             tf.keras.layers.ReLU()])
+
+        self.conv_3_2 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
+                                             kernel_size=(3,3),
+                                             padding='same',
+                                             kernel_initializer=kernel_initializer),
+                                             batch_norm(),
+                                             tf.keras.layers.ReLU()])
+
 
 
 
     def call(self, x,training):
 
-        cpm1=tf.nn.relu(self.conv_1_1(x))
+        cpm1=self.conv_1_1(x,training=training)
 
-        cpm_2_1=tf.nn.relu(self.conv_2_1(x))
-        cpm_2_2=tf.nn.relu(self.conv_2_2(cpm_2_1))
+        cpm_2_1=self.conv_2_1(x,training=training)
+        cpm_2_2=self.conv_2_2(cpm_2_1,training=training)
 
-        cpm_3_1 = tf.nn.relu(self.conv_3_1(cpm_2_1))
-        cpm_3_2 = tf.nn.relu(self.conv_3_2(cpm_3_1))
+        cpm_3_1 = self.conv_3_1(cpm_2_1,training=training)
+        cpm_3_2 =self.conv_3_2(cpm_3_1,training=training)
 
         return tf.concat([cpm1,cpm_2_2,cpm_3_2],axis=3)
 
@@ -79,16 +86,7 @@ class Fpn(tf.keras.Model):
 
         dims_list = cfg.MODEL.fpn_dims
 
-        self.conv_3_2 = tf.keras.layers.Conv2D(filters=dims_list[2],
-                                               kernel_size=(1, 1),
-                                               padding='same',
-                                               kernel_initializer=kernel_initializer
-                                               )
-        self.conv_2_2 = tf.keras.layers.Conv2D(filters=dims_list[2],
-                                               kernel_size=(1, 1),
-                                               padding='same',
-                                               kernel_initializer=kernel_initializer
-                                               )
+
 
 
         self.conv_2_1 = tf.keras.layers.Conv2D(filters=dims_list[1],
@@ -119,15 +117,10 @@ class Fpn(tf.keras.Model):
     def __call__(self, fms,training):
 
 
-        of0,of1,of2,of3,of4,of5=fms
+        of0,of1,of2,of3,of4=fms
 
-        upsample=self.conv_3_2(of3)
 
-        lateral=self.conv_2_2(of2)
-
-        fpn2=self.upsample_product(upsample,lateral)
-
-        upsample = self.conv_2_1(fpn2)
+        upsample = self.conv_2_1(of2)
 
         lateral = self.conv_1_1(of1)
         fpn1 = self.upsample_product(upsample, lateral)
@@ -137,7 +130,7 @@ class Fpn(tf.keras.Model):
         lateral = self.conv_0_0(of0)
         fpn0 = self.upsample_product(upsample, lateral)
 
-        return [fpn0,fpn1,fpn2,of3,of4,of5]
+        return [fpn0,fpn1,of2,of3,of4]
 
 
 
@@ -259,9 +252,11 @@ class DSFD(tf.keras.Model):
         self.base_model = Shufflenet(model_size=model_size,
                                      kernel_initializer=kernel_initializer)
 
-
-
-
+        if cfg.MODEL.fpn:
+            self.fpn=Fpn()
+        if cfg.MODEL.cpm:
+            self.cpm_ops = [CPM(kernel_initializer=kernel_initializer)
+                            for i in range(len(cfg.MODEL.fpn_dims))]
 
         if cfg.MODEL.dual_mode:
             self.ssd_head_origin=SSDHead(ratio_per_pixel=1,
@@ -290,9 +285,20 @@ class DSFD(tf.keras.Model):
         # print(shapes)
 
 
-        o_reg,o_cls=self.ssd_head_origin(fms,training=training)
+        o_reg, o_cls=self.ssd_head_origin(fms,training=training)
 
-        fpn_reg,fpn_cls=self.ssd_head_fem(fms,training=training)
+        if cfg.MODEL.fpn:
+            fpn_fms = self.fpn(fms, training=False)
+        else:
+            fpn_fms = fms
+
+
+
+        if cfg.MODEL.cpm:
+            for i in range(len(fpn_fms)):
+                fpn_fms[i] = self.cpm_ops[i](fpn_fms[i], training=training)
+
+        fpn_reg,fpn_cls=self.ssd_head_fem(fpn_fms,training=training)
 
         return o_reg,o_cls,fpn_reg,fpn_cls
 
@@ -315,9 +321,20 @@ class DSFD(tf.keras.Model):
                end_points['block3'],
                end_points['block4'],
                end_points['block5']]
+        if cfg.MODEL.fpn:
+            fpn_fms = self.fpn(fms, training = False)
+        else:
+            fpn_fms=fms
 
 
-        fpn_reg, fpn_cls = self.ssd_head_fem(fms, training=False)
+        if cfg.MODEL.cpm:
+            for i in range(len(fpn_fms)):
+                fpn_fms[i] = self.cpm_ops[i](fpn_fms[i], training=False)
+
+
+        fpn_reg, fpn_cls = self.ssd_head_fem(fpn_fms, training=False)
+
+
 
         ###get anchor
         ###### adjust the anchors to the image shape, but it trains with a fixed h,w
@@ -392,7 +409,7 @@ if __name__=='__main__':
 
 
 
-    ##teset codes for dsfd models
+    ####test codes for dsfd models
     import time
     model=DSFD()
 
