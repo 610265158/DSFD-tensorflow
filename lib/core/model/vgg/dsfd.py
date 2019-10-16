@@ -21,61 +21,65 @@ def l2_normalization(x, scale):
 
 
 
-
 class CPM(tf.keras.Model):
     def __init__(self,kernel_initializer='glorot_normal'):
         super(CPM, self).__init__()
 
         dim = cfg.MODEL.cpm_dims
 
-        self.conv_1_1=tf.keras.layers.Conv2D(filters=dim//2,
-                                             kernel_size=(3,3),
-                                             dilation_rate=1,
-                                             padding='same',
-                                             kernel_initializer=kernel_initializer
-                                             )
+        self.eyes1=tf.keras.Sequential([tf.keras.layers.Conv2D(filters=dim//2,
+                                                                kernel_size=(3,3),
+                                                                dilation_rate=(1, 1),
+                                                                padding='same',
+                                                                kernel_initializer=kernel_initializer),
+                                           tf.keras.layers.ReLU()])
 
 
-        self.conv_2_1 = tf.keras.layers.Conv2D(filters=dim // 2,
-                                               kernel_size=(3, 3),
-                                               dilation_rate=2,
-                                               padding='same',
-                                               kernel_initializer=kernel_initializer
-                                               )
-        self.conv_2_2 = tf.keras.layers.Conv2D(filters=dim // 4,
-                                               kernel_size=(3, 3),
-                                               dilation_rate=1,
-                                               padding='same',
-                                               kernel_initializer=kernel_initializer
-                                               )
+
+        self.eyes2_1 = tf.keras.Sequential([tf.keras.layers.Conv2D(filters=dim//2,
+                                                                kernel_size=(3,3),
+                                                                dilation_rate=(2, 2),
+                                                                padding='same',
+                                                                kernel_initializer=kernel_initializer),
+                                           tf.keras.layers.ReLU()])
+
+        self.eyes2 = tf.keras.Sequential([tf.keras.layers.Conv2D(filters=dim//4,
+                                                                kernel_size=(3,3),
+                                                                dilation_rate=(1, 1),
+                                                                padding='same',
+                                                                kernel_initializer=kernel_initializer),
+                                           tf.keras.layers.ReLU()])
 
 
-        self.conv_3_1 = tf.keras.layers.Conv2D(filters=dim // 4,
-                                               kernel_size=(3, 3),
-                                               dilation_rate=2,
-                                               padding='same',
-                                               kernel_initializer=kernel_initializer
-                                               )
-        self.conv_3_2 = tf.keras.layers.Conv2D(filters=dim // 4,
-                                               kernel_size=(3, 3),
-                                               dilation_rate=1,
-                                               padding='same',
-                                               kernel_initializer=kernel_initializer
-                                               )
+        self.eyes3_1 = tf.keras.Sequential([tf.keras.layers.Conv2D(filters=dim//4,
+                                                                kernel_size=(3,3),
+                                                                dilation_rate=(2, 2),
+                                                                padding='same',
+                                                                kernel_initializer=kernel_initializer),
+                                           tf.keras.layers.ReLU()])
+
+        self.eyes3 = tf.keras.Sequential([tf.keras.layers.Conv2D(filters=dim//4,
+                                                                kernel_size=(3,3),
+                                                                dilation_rate=(1, 1),
+                                                                padding='same',
+                                                                kernel_initializer=kernel_initializer),
+                                           tf.keras.layers.ReLU()])
+
 
 
 
     def call(self, x,training):
 
-        cpm1=tf.nn.relu(self.conv_1_1(x))
+        cpm1=self.eyes1(x,training=training)
 
-        cpm_2_1=tf.nn.relu(self.conv_2_1(x))
-        cpm_2_2=tf.nn.relu(self.conv_2_2(cpm_2_1))
+        cpm2_1=self.eyes2_1(x,training=training)
+        cpm2=self.eyes2(cpm2_1,training=training)
 
-        cpm_3_1 = tf.nn.relu(self.conv_3_1(cpm_2_1))
-        cpm_3_2 = tf.nn.relu(self.conv_3_2(cpm_3_1))
+        cpm3_1 = self.eyes3_1(cpm2_1,training=training)
+        cpm3 =self.eyes3(cpm3_1,training=training)
 
-        return tf.concat([cpm1,cpm_2_2,cpm_3_2],axis=3)
+        return tf.concat([cpm1,cpm2,cpm3],axis=3)
+
 
 class Fpn(tf.keras.Model):
     def __init__(self,kernel_initializer='glorot_normal'):
@@ -399,6 +403,10 @@ class DSFD(tf.keras.Model):
         fpn_fms[0] = l2_normalization(fpn_fms[0], scale=cfg.MODEL.l2_norm[0])
         fpn_fms[1] = l2_normalization(fpn_fms[1], scale=cfg.MODEL.l2_norm[1])
         fpn_fms[2] = l2_normalization(fpn_fms[2], scale=cfg.MODEL.l2_norm[2])
+
+        if cfg.MODEL.cpm:
+            for i in  range(len(fpn_fms)):
+                fpn_fms[i]=self.cpm_ops[i](fpn_fms[i],training=training)
 
         fpn_reg, fpn_cls = self.ssd_head_fem(fpn_fms, training=training)
 
