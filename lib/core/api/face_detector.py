@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import cv2
 import time
-
+import math
 from train_config import config as cfg
 
 class FaceDetector:
@@ -29,10 +29,10 @@ class FaceDetector:
 
         if input_shape is None:
             h,w,c=image.shape
-            input_shape = (np.ceil(h / 32 ) * 32, np.ceil(w / 32 ) * 32)
+            input_shape = (math.ceil(h / 32 ) * 32, math.ceil(w / 32 ) * 32)
         else:
             h, w = input_shape
-            input_shape = (np.ceil(h / 32 ) * 32, np.ceil(w / 32 ) * 32)
+            input_shape = (math.ceil(h / 32 ) * 32, math.ceil(w / 32 ) * 32)
 
         image_fornet, scale_x, scale_y,dx,dy = self.preprocess(image,
                                                          target_height=input_shape[0],
