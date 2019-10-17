@@ -7,7 +7,7 @@ from configs.SF_config import config as shufflenet_config
 
 
 ##### the config for different backbone
-config=shufflenet_config
+config=vgg_config
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"          ##if u use muti gpu set them visiable there and then set config.TRAIN.num_gpu
 config.TRAIN.num_gpu = 1
