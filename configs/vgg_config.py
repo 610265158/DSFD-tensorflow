@@ -36,13 +36,6 @@ config.MODEL.fpn_dims=[256,512,512,1024,512,256]
 config.MODEL.cpm_dims=512
 
 
-# config.MODEL = edict()
-# config.MODEL.net_structure='shufflenet'
-# config.MODEL.model_path = './model/'  # save directory
-# config.MODEL.pretrained_model=None#'vgg_16.ckpt'
-# config.MODEL.fpn_dims=[48,96,96,96,96,96]
-# config.MODEL.fem_dims=96
-
 config.MODEL.fpn=True
 config.MODEL.cpm=True
 config.MODEL.dual_mode=True
