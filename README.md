@@ -31,7 +31,8 @@ widerface val set
 | :------: | 
 |  0.987 | 
 
-
+## update
+The tf2 branch is a reimplement based on tensorflow2, the codes is runable and can produce right results, but no pretrained model(not finish). Welcome to test it.
 
 ## requirment
 
