@@ -29,7 +29,10 @@ class FaceDetector:
 
         if input_shape is None:
             h,w,c=image.shape
-            input_shape = ((h // 32 + 1) * 32, (w // 32 + 1) * 32)
+            input_shape = (np.ceil(h / 32 ) * 32, np.ceil(w / 32 ) * 32)
+        else:
+            h, w = input_shape
+            input_shape = (np.ceil(h / 32 ) * 32, np.ceil(w / 32 ) * 32)
 
         image_fornet, scale_x, scale_y,dx,dy = self.preprocess(image,
                                                          target_height=input_shape[0],
