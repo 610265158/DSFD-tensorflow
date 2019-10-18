@@ -35,7 +35,7 @@ widerface val set
 
 ## requirment
 
-+ tensorflow1.12
++ tensorflow2.0
 
 + tensorpack (for data provider)
 
@@ -52,25 +52,16 @@ and release the WIDER_train, WIDER_val and wider_face_split into ./WIDER, then r
 (if u like train u own data, u should prepare the data like this:
 `...../9_Press_Conference_Press_Conference_9_659.jpg| 483(xmin),195(ymin),735(xmax),543(ymax),1(class) ......` 
 one line for one pic, **caution! class should start from 1, 0 means bg**)
-2. download the imagenet pretrained vgg16 model from http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz
-release it in the root dir,
+2. set config=vgg_config in train_config.py   or another one
 
-3. but if u want to train from scratch set config.MODEL.pretrained_model=None,
+3. if recover from a pretrained model  set config.MODEL.pretrained_model='yourmodel'
 
-4. if recover from a complet pretrained model  set config.MODEL.pretrained_model='yourmodel.ckpt',config.MODEL.continue_train=True
-
-5. then, run:
+4. then, run:
 
    ```python train.py```
    
    and if u want to check the data when training, u could set vis in train_config.py as True
 
-
-6. After training, run:
-
-   ```python tools/auto_freeze.py```
-
-   it reads the checkpoint file and produces detector.pb .
 
 
 ### evaluation
@@ -78,7 +69,7 @@ release it in the root dir,
 ```
     python model_eval/fddb.py [--model [TRAINED_MODEL]] [--data_dir [DATA_DIR]]
                           [--split_dir [SPLIT_DIR]] [--result [RESULT_DIR]]
-    --model              Path of the saved model,default ./model/detector.pb
+    --model              Path of the saved model,default ./model/detector
     --data_dir           Path of fddb all images
     --split_dir          Path of fddb folds
     --result             Path to save fddb results
@@ -93,7 +84,7 @@ example `python model_eval/fddb.py --model model/detector.pb
 ```
     python model_eval/wider.py [--model [TRAINED_MODEL]] [--data_dir [DATA_DIR]]
                            [--result [RESULT_DIR]]
-    --model              Path of the saved model,default ./model/detector.pb
+    --model              Path of the saved model,default ./model/detector
     --data_dir           Path of WIDER
     --result             Path to save WIDERface results
  ```
