@@ -274,6 +274,16 @@ class Anchor():
 
         self.anchors = self.produce_anchors()
 
+
+
+
+anchor_tools=Anchor()
+
+
+
+
+
+
 if __name__=='__main__':
 
     import cv2

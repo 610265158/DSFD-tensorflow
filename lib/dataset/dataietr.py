@@ -1,6 +1,3 @@
-
-
-
 import os
 import random
 import cv2
@@ -21,7 +18,7 @@ from lib.dataset.augmentor.augmentation import Random_scale_withbbox,\
 from lib.dataset.augmentor.visual_augmentation import ColorDistort
 
 from train_config import config as cfg
-
+from lib.core.anchor.anchor import anchor_tools
 
 class data_info():
     def __init__(self,img_root,txt):
@@ -139,7 +136,7 @@ class MutiScaleBatcher(BatchData):
             max_shape[0] = int(np.ceil(max_shape[0] / self.divide_size) * self.divide_size)
             max_shape[1] = int(np.ceil(max_shape[1] / self.divide_size) * self.divide_size)
 
-            cfg.ANCHOR.achor.reset_anchors((max_shape[1], max_shape[0]))
+            anchor_tools.reset_anchors((max_shape[1], max_shape[0]))
         else:
             max_shape=self.input_size
 
@@ -168,7 +165,7 @@ class MutiScaleBatcher(BatchData):
                     cv2.rectangle(image, (int(__box[0]), int(__box[1])),
                                   (int(__box[2]), int(__box[3])), (255, 0, 0), 4)
 
-            all_boxes, all_labels = cfg.ANCHOR.achor.produce_target(boxes_, klass_)
+            all_boxes, all_labels = anchor_tools.produce_target(boxes_, klass_)
 
             alig_data.append([image, all_boxes, all_labels])
 

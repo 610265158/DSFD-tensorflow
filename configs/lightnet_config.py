@@ -16,10 +16,11 @@ config.TRAIN.batch_size = 32                    ###A big batch size may achieve 
 config.TRAIN.log_interval = 100
 config.TRAIN.epoch = 250                      ###just keep training , evaluation shoule be take care by yourself,
                                                ### generally 10,0000 iters is enough
-
-config.TRAIN.lr_value_every_epoch = [0.00001,0.0001,0.001,0.0001,0.00001,0.000001]          ####lr policy
-config.TRAIN.lr_decay_every_epoch = [1,2,100,150,200]
-
+#
+# config.TRAIN.lr_value_every_epoch = [0.00001,0.0001,0.001,0.0001,0.00001,0.000001]          ####lr policy
+# config.TRAIN.lr_decay_every_epoch = [1,2,100,150,200]
+config.TRAIN.lr_value_every_epoch = [0.0001,0.00001,0.000001,0.0000001]          ####lr policy
+config.TRAIN.lr_decay_every_epoch = [50,100,150]
 config.TRAIN.weight_decay_factor = 5.e-4                  ##l2 regular
 config.TRAIN.vis=False                                    ##check data flag
 config.TRAIN.opt='Adam'
@@ -43,12 +44,12 @@ config.DATA.num_class = config.DATA.num_category + 1        # +1 background
 config.DATA.PIXEL_MEAN = [123., 116., 103.]                 ###rgb
 config.DATA.PIXEL_STD = [58., 57., 57.]
 
-config.DATA.hin = 512  # input size
-config.DATA.win = 512
+config.DATA.hin = 416  # input size
+config.DATA.win = 416
 config.DATA.max_size=[config.DATA.hin,config.DATA.win]  ##h,w
-config.DATA.cover_small_face=10                          ###cover the small faces
+config.DATA.cover_small_face=8                          ###cover the small faces
 
-config.DATA.mutiscale=False                #if muti scale set False  then config.DATA.MAX_SIZE will be the inputsize
+config.DATA.mutiscale=True                #if muti scale set False  then config.DATA.MAX_SIZE will be the inputsize
 config.DATA.scales=(320,640)
 
 
@@ -70,9 +71,9 @@ config.ANCHOR.super_match=True
 
 
 config.MODEL = edict()
-config.MODEL.net_structure='ShuffleNetV2_0.5'
+config.MODEL.net_structure='Lightnet_0.75'
 config.MODEL.model_path = './model/'  # save directory
-config.MODEL.pretrained_model=None#'vgg_16.ckpt'
+config.MODEL.pretrained_model=None
 config.MODEL.fpn_dims=[96,96,96,96,96]
 config.MODEL.cpm_dims=128
 

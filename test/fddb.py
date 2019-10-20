@@ -9,7 +9,7 @@ import argparse
 
 from lib.core.api.face_detector import FaceDetector
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 ap = argparse.ArgumentParser()
 ap.add_argument( "--model", required=True, default='./model/detector', help="model to eval:")
@@ -107,7 +107,7 @@ for n in tqdm(images_to_use):
     ##flip det
     flip_img=np.flip(image_array,1)
 
-    boxes_flip_ = face_detector(flip_img, score_threshold=0.01)
+    boxes_flip_ = face_detector(flip_img, score_threshold=0.05)
     boxes_flip = np.zeros(boxes_flip_.shape)
     boxes_flip[:, 0] = flip_img.shape[1] - boxes_flip_[:, 2]
     boxes_flip[:, 1] = boxes_flip_[:, 1]

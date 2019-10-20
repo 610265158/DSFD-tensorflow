@@ -14,7 +14,7 @@ class FaceDetector:
 
         self.model = tf.saved_model.load(model_path)
 
-    def __call__(self, image,score_threshold=0.5,input_shape=(416,416)):
+    def __call__(self, image,score_threshold=0.5,input_shape=(320,320)):
         """Detect faces.
 
         Arguments:
@@ -43,7 +43,7 @@ class FaceDetector:
         start = time.time()
         res = self.model.inference(image_fornet)
 
-        #print('xx', time.time() - start)
+        print('xx', time.time() - start)
 
         boxes = res['boxes'].numpy()
         label = res['labels'].numpy()
