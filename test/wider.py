@@ -15,6 +15,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument( "--model", required=True, default='./model/detector', help="model to eval:")
 ap.add_argument( "--is_show", required=False, default=False, help="show result or not?")
 ap.add_argument( "--data_dir", required=False, default="./WIDER/WIDER_val", help="dir to img")
+ap.add_argument( "--multiscale", required=False, default=True, help="test in multiscale")
 ap.add_argument( "--result", required=False,default='./result',help="dir to write result")
 args = ap.parse_args()
 
@@ -170,10 +171,13 @@ for index, event in enumerate(event_list):
 
             det1 = flip_test( img, shrink)
             ##flip det
+            if args.multiscale:
+                [det2, det3] = multi_scale_test( img, max_im_shrink)
+                #####
+                det = np.row_stack((det0, det1, det2, det3))
+            else:
+                det = np.row_stack((det0, det1))
 
-            [det2, det3] = multi_scale_test( img, max_im_shrink)
-            #####
-            det = np.row_stack((det0, det1, det2, det3))
             dets = bbox_vote(det)
 
 

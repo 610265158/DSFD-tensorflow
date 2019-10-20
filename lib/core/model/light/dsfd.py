@@ -27,7 +27,7 @@ class CPM(tf.keras.Model):
 
         dim = cfg.MODEL.cpm_dims
 
-        self.conv_1_1=tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//2,
+        self.conv1=tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//2,
                                              kernel_size=(3,3),
                                              padding='same',
                                              kernel_initializer=kernel_initializer),
@@ -36,14 +36,7 @@ class CPM(tf.keras.Model):
 
 
 
-        self.conv_2_1 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//2,
-                                             kernel_size=(3,3),
-                                             padding='same',
-                                             kernel_initializer=kernel_initializer),
-                                             #batch_norm(),
-                                             tf.keras.layers.ReLU()])
-
-        self.conv_2_2 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
+        self.conv2 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
                                              kernel_size=(3,3),
                                              padding='same',
                                              kernel_initializer=kernel_initializer),
@@ -51,34 +44,23 @@ class CPM(tf.keras.Model):
                                              tf.keras.layers.ReLU()])
 
 
-        self.conv_3_1 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
+        self.conv3 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
                                              kernel_size=(3,3),
                                              padding='same',
                                              kernel_initializer=kernel_initializer),
                                              #batch_norm(),
                                              tf.keras.layers.ReLU()])
-
-        self.conv_3_2 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
-                                             kernel_size=(3,3),
-                                             padding='same',
-                                             kernel_initializer=kernel_initializer),
-                                             #batch_norm(),
-                                             tf.keras.layers.ReLU()])
-
-
 
 
     def call(self, x,training):
 
-        cpm1=self.conv_1_1(x,training=training)
+        cpm1=self.conv1(x,training=training)
 
-        cpm_2_1=self.conv_2_1(x,training=training)
-        cpm_2_2=self.conv_2_2(cpm_2_1,training=training)
+        cpm2=self.conv2(x,training=training)
 
-        cpm_3_1 = self.conv_3_1(cpm_2_1,training=training)
-        cpm_3_2 =self.conv_3_2(cpm_3_1,training=training)
+        cpm3 =self.conv3(cpm2,training=training)
 
-        return tf.concat([cpm1,cpm_2_2,cpm_3_2],axis=3)
+        return tf.concat([cpm1,cpm2,cpm3],axis=3)
 
 class Fpn(tf.keras.Model):
     def __init__(self,kernel_initializer='glorot_normal'):

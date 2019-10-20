@@ -21,7 +21,7 @@ pretrained model can be download from
 
 
 | model         |input_size| time_cost |   device   |fddb      |
-| :------:      |:------:  |:------:   |   :------: |:------:  | 
+| :------:      |:------:  |:------:   |   :------: |:------:  |
 | vgg           |free      |None       |    None    | 0.987    |
 | vgg           |512x512   |round 20ms |   2080ti   | 0.987    |
 | Lightnet_0.75 |512x512   |11ms       |   i7-8700k | 0.95     |
@@ -29,6 +29,12 @@ pretrained model can be download from
 | Lightnet_0.75 |320x320   |6+ms       |   i7-8700k | 0.921    |
 | Lightnet_0.5  |512x512   |11ms       |   i7-8700k | 0.934    |
 | Lightnet_0.5  |320x320   |6 ms       |   i7-8700k | 0.907    |
+
+| model         |input_size| time_cost |   device   |wider easy|wider easy |wider easy |
+| :------:      |:------:  |:------:   |   :------: |:------:  | :------:  | :------:  | 
+| Lightnet_0.75 |mutiscale |None       |   None     | 0.876    |0.860      |0.714      |
+| Lightnet_0.75 |1600x1600 |20ms not stable|2080ti  | 0.821    |0.815      |0.555      |
+| Lightnet_0.75 |640x640   |5+ms       |   2080ti   | 0.884    |0.687      |0.287      |
 
 ps the time cost including nms
 
@@ -83,7 +89,7 @@ example `python model_eval/fddb.py --model model/detector
 ** widerface **
 ```
     python model_eval/wider.py [--model [TRAINED_MODEL]] [--data_dir [DATA_DIR]]
-                           [--result [RESULT_DIR]]
+                           [--result [RESULT_DIR]] [--multiscale [use mutiscale test]]
     --model              Path of the saved model,default ./model/detector
     --data_dir           Path of WIDER
     --result             Path to save WIDERface results

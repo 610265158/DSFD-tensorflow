@@ -9,13 +9,12 @@ config.TRAIN = edict()
 
 #### below are params for dataiter
 config.TRAIN.process_num = 5                      ### process_num for data provider
-config.TRAIN.prefetch_size = 10                  ### prefect Q size for data provider
+config.TRAIN.prefetch_size = 10                   ### prefect Q size for data provider
 
 config.TRAIN.num_gpu = 1                         ##match with   os.environ["CUDA_VISIBLE_DEVICES"]
-config.TRAIN.batch_size = 8                    ###A big batch size may achieve a better result, but the memory is a problem
+config.TRAIN.batch_size = 8                      ###A big batch size may achieve a better result, but the memory is a problem
 config.TRAIN.log_interval = 100
-config.TRAIN.epoch = 300                      ###just keep training , evaluation shoule be take care by yourself,
-                                               ### generally 10,0000 iters is enough
+config.TRAIN.epoch = 100
 
 config.TRAIN.lr_value_every_epoch = [0.000001,0.00001,0.0001,0.00001,0.000001,0.0000001]          ####lr policy
 config.TRAIN.lr_decay_every_epoch = [1,2,40,50,60]
