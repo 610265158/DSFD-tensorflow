@@ -299,6 +299,9 @@ class DSFD(tf.keras.Model):
                                         fm_levels=5,
                                         kernel_initializer=kernel_initializer)
 
+
+
+
     def call(self,images,training):
 
         x=self.preprocess(images)
@@ -426,6 +429,8 @@ class DSFD(tf.keras.Model):
         return {'boxes': boxes, 'scores': scores,'labels':labels, 'num_boxes': num_detections}
 
 
+
+
 if __name__=='__main__':
 
 
@@ -436,9 +441,10 @@ if __name__=='__main__':
 
     image = np.zeros(shape=(1, 320, 320, 3), dtype=np.float32)
 
-    model.inference(image,0.5,0.3)
+    model.inference(image,0.5,0.45)
 
+    #tf.saved_model.save(model, './model/xx')
     start = time.time()
     for i in range(100):
-        model.inference(image,0.5,0.3)
+        model.inference(image,0.5,0.45)
     print('xxxyyy', (time.time() - start) / 100.)
