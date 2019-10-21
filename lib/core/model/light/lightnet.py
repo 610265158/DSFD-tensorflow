@@ -199,35 +199,21 @@ class Lightnet(tf.keras.Model):
         self.block3 = LightnetBlock(self.initial_depth * 2 ,
                                      repeat=4,
                                      kernel_initializer=kernel_initializer)
-        self.block4 = LightnetBlock(self.initial_depth * 2* 2 ,
-                                      repeat=4,
-                                      kernel_initializer=kernel_initializer)
-        self.block5 = LightnetBlock(self.initial_depth * 2* 2,
-                                      repeat=4,
-                                      kernel_initializer=kernel_initializer)
+
 
     def call(self, inputs, training=False):
 
-        end_points={}
+
         x=self.first_conv(inputs,training=training)
 
-        end_points['block0'] = x
+        x1=self.block1(x,training=training)
 
-        x=self.block1(x,training=training)
-        end_points['block1'] = x
+        x2=self.block2(x1, training=training)
 
-        x=self.block2(x, training=training)
-        end_points['block2'] = x
+        x3=self.block3(x2, training=training)
 
-        x=self.block3(x, training=training)
-        end_points['block3'] = x
 
-        x = self.block4(x, training=training)
-        end_points['block4'] = x
-
-        x = self.block5(x, training=training)
-        end_points['block5'] = x
-        return x, end_points
+        return x1,x2,x3
 
 
 

@@ -161,7 +161,54 @@ class MaxOut(tf.keras.Model):
 
 
         return cls_pre
+class Extra(tf.keras.Model):
+    def __init__(self,kernel_initializer='glorot_normal'):
+        super(Extra, self).__init__()
 
+        self.extra_conv1=tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=128,
+                                                                     kernel_size=(1, 1),
+                                                                     strides=2,
+                                                                     padding='same',
+                                                                     kernel_initializer=kernel_initializer
+                                                                     ),
+                                                tf.keras.layers.ReLU(),
+                                                tf.keras.layers.SeparableConv2D(filters=256,
+                                                                       kernel_size=(3, 3),
+                                                                       padding='same',
+                                                                       kernel_initializer=kernel_initializer),
+                                                tf.keras.layers.ReLU()
+                                                ])
+
+        self.extra_conv2=tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=128,
+                                                                     kernel_size=(1, 1),
+                                                                     padding='same',
+                                                                     kernel_initializer=kernel_initializer),
+                                                tf.keras.layers.ReLU(),
+                                                tf.keras.layers.SeparableConv2D(filters=256,
+                                                                       kernel_size=(3, 3),
+                                                                       strides=2,
+                                                                       padding='same',
+                                                                       kernel_initializer=kernel_initializer
+                                                                       ),
+                                                tf.keras.layers.ReLU()
+                                                ])
+
+
+
+
+
+
+
+
+    def __call__(self, x,training):
+
+        extra_fms=[]
+        x=self.extra_conv1(x,training=training)
+        extra_fms.append(x)
+        x = self.extra_conv2(x,training=training)
+        extra_fms.append(x)
+
+        return extra_fms
 class SSDHead(tf.keras.Model):
     def __init__(self,
                  ratio_per_pixel=None,
@@ -233,6 +280,8 @@ class DSFD(tf.keras.Model):
         model_size=cfg.MODEL.net_structure.split('_',1)[-1]
         self.base_model = Lightnet(model_size=model_size,
                                      kernel_initializer=kernel_initializer)
+        self.extra=Extra(kernel_initializer=kernel_initializer)
+
 
         if cfg.MODEL.fpn:
             self.fpn=Fpn()
@@ -254,19 +303,11 @@ class DSFD(tf.keras.Model):
 
         x=self.preprocess(images)
 
-        net,end_points=self.base_model(x,training=training)
+        of0,of1,of2=self.base_model(x,training=training)
 
+        of3,of4=self.extra(of2, training=training)
 
-        fms=[#end_points['block0'],
-             end_points['block1'],
-             end_points['block2'],
-             end_points['block3'],
-             end_points['block4'],
-             end_points['block5']]
-
-        # shapes = [y.shape for y in fms]
-        # print(shapes)
-
+        fms=[of0,of1,of2,of3,of4]
 
         o_reg, o_cls=self.ssd_head_origin(fms,training=training)
 
@@ -274,7 +315,6 @@ class DSFD(tf.keras.Model):
             fpn_fms = self.fpn(fms, training=False)
         else:
             fpn_fms = fms
-
 
 
         if cfg.MODEL.cpm:
@@ -296,14 +336,14 @@ class DSFD(tf.keras.Model):
 
         x = self.preprocess(images)
 
-        net, end_points = self.base_model(x, training=False)
+        of0, of1, of2 = self.base_model(x, training=False)
 
-        fms = [#end_points['block0'],
-               end_points['block1'],
-               end_points['block2'],
-               end_points['block3'],
-               end_points['block4'],
-               end_points['block5']]
+        of3, of4 = self.extra(of2, training=False)
+
+        fms = [of0, of1, of2, of3, of4]
+
+
+
         if cfg.MODEL.fpn:
             fpn_fms = self.fpn(fms, training = False)
         else:
