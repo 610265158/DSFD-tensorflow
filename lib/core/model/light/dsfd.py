@@ -331,7 +331,7 @@ class DSFD(tf.keras.Model):
         return o_reg,o_cls,fpn_reg,fpn_cls
 
 
-    @tf.function(input_signature=[tf.TensorSpec([None, 320, 320, 3], tf.float32),
+    @tf.function(input_signature=[tf.TensorSpec([None, None, None, 3], tf.float32),
                                   tf.TensorSpec(None, tf.float32),
                                   tf.TensorSpec(None, tf.float32)
                                   ])
