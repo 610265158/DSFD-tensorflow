@@ -14,7 +14,7 @@ class FaceDetector:
 
         self.model = tf.saved_model.load(model_path)
 
-    def __call__(self, image,score_threshold=0.5,input_shape=(640,640)):
+    def __call__(self, image,score_threshold=0.5,input_shape=(416,416)):
         """Detect faces.
 
         Arguments:

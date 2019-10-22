@@ -26,7 +26,8 @@ pretrained model can be download from
 | vgg           |512x512   |round 20ms |   2080ti   | 0.987    |
 | Lightnet_0.75 |416x416   |12+ms      |   i7-8700k | 0.961    |
 | Lightnet_0.75 |320x320   |8+ms       |   i7-8700k | 0.950    |
-
+| Lightnet_0.75 |416x416   |35+ms      |   i5-7200U | 0.961    |
+| Lightnet_0.75 |320x320   |20+ms      |   i5-7200U | 0.950    |
 
 | model         |input_size| time_cost |   device   |wider easy|wider easy |wider easy |
 | :------:      |:------:  |:------:   |   :------: |:------:  | :------:  | :------:  | 
