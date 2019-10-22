@@ -28,7 +28,7 @@ config.TEST = edict()
 config.TEST.parallel_iterations=8
 config.TEST.score_thres = 0.05
 config.TEST.iou_thres = 0.3
-config.TEST.max_detect = 1500
+config.TEST.max_detect = 800
 
 
 
@@ -57,26 +57,23 @@ config.ANCHOR.rect=True
 config.ANCHOR.rect_longer=True       ####    make anchor h/w=1.5
 config.ANCHOR.ANCHOR_STRIDE = 16
 config.ANCHOR.ANCHOR_SIZES = (24, 96, 384, 512)   # sqrtarea of the anchor box
-config.ANCHOR.ANCHOR_STRIDES = (16, 32, 64, 128)  # strides for each FPN level. Must be the same length as ANCHOR_SIZES
+config.ANCHOR.ANCHOR_STRIDES = (8, 16, 32, 64)    # strides for each FPN level. Must be the same length as ANCHOR_SIZES
 config.ANCHOR.ANCHOR_RATIOS = (1., 4.) ######           1:2 in size,
 config.ANCHOR.POSITIVE_ANCHOR_THRESH = 0.3
 config.ANCHOR.NEGATIVE_ANCHOR_THRESH = 0.3
 config.ANCHOR.AVG_MATCHES=20
 config.ANCHOR.super_match=True
 
-
-
-
-
 config.MODEL = edict()
-config.MODEL.net_structure='Lightnet_0.75'
+config.MODEL.net_structure='Lightnet_0.5'
 config.MODEL.model_path = './model/'  # save directory
 config.MODEL.pretrained_model=None
 config.MODEL.fpn_dims=[96,96,96*2,96*2]
 config.MODEL.cpm_dims=256
+config.MODEL.cpm_level=1
 
 config.MODEL.fpn=False
-config.MODEL.cpm=True
+config.MODEL.cpm=False
 config.MODEL.dual_mode=False
 config.MODEL.maxout=False
 config.MODEL.max_negatives_per_positive= 3.0
