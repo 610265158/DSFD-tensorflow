@@ -24,17 +24,15 @@ pretrained model can be download from
 | :------:      |:------:  |:------:   |   :------: |:------:  |
 | vgg           |free      |None       |    None    | 0.987    |
 | vgg           |512x512   |round 20ms |   2080ti   | 0.987    |
-| Lightnet_0.75 |512x512   |11ms       |   i7-8700k | 0.95     |
-| Lightnet_0.75 |416x416   |8+ms       |   i7-8700k | 0.937    |
-| Lightnet_0.75 |320x320   |6+ms       |   i7-8700k | 0.921    |
-| Lightnet_0.5  |512x512   |11ms       |   i7-8700k | 0.934    |
-| Lightnet_0.5  |320x320   |6 ms       |   i7-8700k | 0.907    |
+| Lightnet_0.75 |416x416   |12+ms      |   i7-8700k | 0.961    |
+| Lightnet_0.75 |320x320   |8+ms       |   i7-8700k | 0.950    |
+
 
 | model         |input_size| time_cost |   device   |wider easy|wider easy |wider easy |
 | :------:      |:------:  |:------:   |   :------: |:------:  | :------:  | :------:  | 
-| Lightnet_0.75 |mutiscale |None       |   None     | 0.876    |0.860      |0.714      |
-| Lightnet_0.75 |1600x1600 |20ms not stable|2080ti  | 0.821    |0.815      |0.555      |
-| Lightnet_0.75 |640x640   |5+ms       |   2080ti   | 0.884    |0.687      |0.287      |
+| Lightnet_0.75 |mutiscale |None       |   None     | None     |None       |None      |
+| Lightnet_0.75 |1600x1600 |20ms not stable|2080ti  | None     |None       |None      |
+| Lightnet_0.75 |640x640   |5+ms       |   2080ti   | 0.892    |0.828      |0.462      |
 
 ps the time cost including nms
 

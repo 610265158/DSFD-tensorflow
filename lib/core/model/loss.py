@@ -12,22 +12,25 @@ from train_config import config as cfg
 
 
 def calculate_loss( origin_reg, origin_cls,final_reg, final_cls,boxes,labels):
-    ## first shot anchors
-    boxes_small = boxes[:, 1::2]
-    label_small = labels[:, 1::2]
-    ## first shot loss
-    reg_loss, cls_loss = ssd_loss(origin_reg, origin_cls, boxes_small, label_small)
 
-    ## second shot anchors
-    boxes_norm = boxes[:, 0::2]
-    label_norm = labels[:, 0::2]
-    ## second shot loss
+    if origin_cls is not  None:
+        ## first shot anchors
+        boxes_small = boxes[:, 1::2]
+        label_small = labels[:, 1::2]
+        ## first shot loss
+        reg_loss, cls_loss = ssd_loss(origin_reg, origin_cls, boxes_small, label_small)
 
-    final_reg_loss, final_cls_loss_dual = ssd_loss(final_reg, final_cls, boxes_norm, label_norm)
+        ## second shot anchors
+        boxes_norm = boxes[:, 0::2]
+        label_norm = labels[:, 0::2]
+        ## second shot loss
 
-    reg_loss = (reg_loss + final_reg_loss)
-    cls_loss = (cls_loss + final_cls_loss_dual)
+        final_reg_loss, final_cls_loss_dual = ssd_loss(final_reg, final_cls, boxes_norm, label_norm)
 
+        reg_loss = (reg_loss + final_reg_loss)
+        cls_loss = (cls_loss + final_cls_loss_dual)
+    else:
+        reg_loss, cls_loss = ssd_loss(final_reg, final_cls, boxes, labels)
 
     return reg_loss+cls_loss
 

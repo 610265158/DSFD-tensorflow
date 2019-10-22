@@ -194,7 +194,7 @@ class Lightnet(tf.keras.Model):
                                      repeat=2,
                                      kernel_initializer=kernel_initializer)
         self.block2 = LightnetBlock(self.initial_depth * 2,
-                                     repeat=2,
+                                     repeat=4,
                                      kernel_initializer=kernel_initializer)
         self.block3 = LightnetBlock(self.initial_depth * 2 ,
                                      repeat=4,
@@ -213,7 +213,7 @@ class Lightnet(tf.keras.Model):
         x3=self.block3(x2, training=training)
 
 
-        return x1,x2,x3
+        return x2,x3
 
 
 

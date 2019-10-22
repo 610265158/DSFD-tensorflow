@@ -22,7 +22,7 @@ config.TRAIN.lr_decay_every_epoch = [1,2,100,150,200]
 config.TRAIN.weight_decay_factor = 5.e-4                  ##l2 regular
 config.TRAIN.vis=False                                    ##check data flag
 config.TRAIN.opt='Adam'
-config.TRAIN.mix_precision=True
+config.TRAIN.mix_precision=False
 
 config.TEST = edict()
 config.TEST.parallel_iterations=8
@@ -42,12 +42,12 @@ config.DATA.num_class = config.DATA.num_category + 1        # +1 background
 config.DATA.PIXEL_MEAN = [123., 116., 103.]                 ###rgb
 config.DATA.PIXEL_STD = [58., 57., 57.]
 
-config.DATA.hin = 416  # input size
-config.DATA.win = 416
+config.DATA.hin = 512  # input size
+config.DATA.win = 512
 config.DATA.max_size=[config.DATA.hin,config.DATA.win]  ##h,w
-config.DATA.cover_small_face=8                          ###cover the small faces
+config.DATA.cover_small_face=10                          ###cover the small faces
 
-config.DATA.mutiscale=True                #if muti scale set False  then config.DATA.MAX_SIZE will be the inputsize
+config.DATA.mutiscale=False                #if muti scale set False  then config.DATA.MAX_SIZE will be the inputsize
 config.DATA.scales=(320,640)
 
 
@@ -56,11 +56,11 @@ config.ANCHOR = edict()
 config.ANCHOR.rect=True
 config.ANCHOR.rect_longer=True       ####    make anchor h/w=1.5
 config.ANCHOR.ANCHOR_STRIDE = 16
-config.ANCHOR.ANCHOR_SIZES = (32,64, 128, 256, 512)   # sqrtarea of the anchor box
-config.ANCHOR.ANCHOR_STRIDES = (8,16, 32, 64, 128)  # strides for each FPN level. Must be the same length as ANCHOR_SIZES
+config.ANCHOR.ANCHOR_SIZES = (24, 96, 384, 512)   # sqrtarea of the anchor box
+config.ANCHOR.ANCHOR_STRIDES = (16, 32, 64, 128)  # strides for each FPN level. Must be the same length as ANCHOR_SIZES
 config.ANCHOR.ANCHOR_RATIOS = (1., 4.) ######           1:2 in size,
-config.ANCHOR.POSITIVE_ANCHOR_THRESH = 0.35
-config.ANCHOR.NEGATIVE_ANCHOR_THRESH = 0.35
+config.ANCHOR.POSITIVE_ANCHOR_THRESH = 0.3
+config.ANCHOR.NEGATIVE_ANCHOR_THRESH = 0.3
 config.ANCHOR.AVG_MATCHES=20
 config.ANCHOR.super_match=True
 
@@ -69,15 +69,15 @@ config.ANCHOR.super_match=True
 
 
 config.MODEL = edict()
-config.MODEL.net_structure='Lightnet_0.5'
+config.MODEL.net_structure='Lightnet_0.75'
 config.MODEL.model_path = './model/'  # save directory
 config.MODEL.pretrained_model=None
-config.MODEL.fpn_dims=[96,96,96,96*2,96*2]
+config.MODEL.fpn_dims=[96,96,96*2,96*2]
 config.MODEL.cpm_dims=256
 
-config.MODEL.fpn=True
+config.MODEL.fpn=False
 config.MODEL.cpm=True
-config.MODEL.dual_mode=True
+config.MODEL.dual_mode=False
 config.MODEL.maxout=False
 config.MODEL.max_negatives_per_positive= 3.0
 

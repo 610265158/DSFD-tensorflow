@@ -292,27 +292,34 @@ class DSFD(tf.keras.Model):
 
         if cfg.MODEL.dual_mode:
             self.ssd_head_origin=SSDHead(ratio_per_pixel=1,
-                                         fm_levels=5,
+                                         fm_levels=4,
                                          kernel_initializer=kernel_initializer)
 
             self.ssd_head_fem = SSDHead(ratio_per_pixel=1,
-                                        fm_levels=5,
+                                        fm_levels=4,
                                         kernel_initializer=kernel_initializer)
 
-
+        else:
+            self.ssd_head_fem = SSDHead(ratio_per_pixel=2,
+                                        fm_levels=4,
+                                        kernel_initializer=kernel_initializer)
 
 
     def call(self,images,training):
 
         x=self.preprocess(images)
 
-        of0,of1,of2=self.base_model(x,training=training)
+        of1,of2=self.base_model(x,training=training)
 
         of3,of4=self.extra(of2, training=training)
 
-        fms=[of0,of1,of2,of3,of4]
+        fms=[of1,of2,of3,of4]
 
-        o_reg, o_cls=self.ssd_head_origin(fms,training=training)
+        if cfg.MODEL.dual_mode:
+            o_reg, o_cls=self.ssd_head_origin(fms,training=training)
+        else:
+            o_reg=None
+            o_cls=None
 
         if cfg.MODEL.fpn:
             fpn_fms = self.fpn(fms, training=False)
@@ -339,11 +346,11 @@ class DSFD(tf.keras.Model):
 
         x = self.preprocess(images)
 
-        of0, of1, of2 = self.base_model(x, training=False)
+        of1, of2 = self.base_model(x, training=False)
 
         of3, of4 = self.extra(of2, training=False)
 
-        fms = [of0, of1, of2, of3, of4]
+        fms = [of1, of2, of3, of4]
 
 
 
