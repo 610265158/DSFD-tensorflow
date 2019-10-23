@@ -28,26 +28,29 @@ class CPM(tf.keras.Model):
         dim = cfg.MODEL.cpm_dims
 
         self.conv1=tf.keras.Sequential([tf.keras.layers.Conv2D(filters=dim//2,
-                                             kernel_size=(1,1),
-                                             padding='same',
-                                             kernel_initializer=kernel_initializer),
+                                                               kernel_size=(1,1),
+                                                               padding='same',
+                                                               kernel_initializer=kernel_initializer,
+                                                               use_bias=False),
                                            batch_norm(),
                                            tf.keras.layers.ReLU()])
 
 
 
         self.conv2 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
-                                             kernel_size=(3,3),
-                                             padding='same',
-                                             kernel_initializer=kernel_initializer),
+                                                                          kernel_size=(3,3),
+                                                                          padding='same',
+                                                                          kernel_initializer=kernel_initializer,
+                                                                          use_bias=False),
                                              batch_norm(),
                                              tf.keras.layers.ReLU()])
 
 
         self.conv3 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
-                                             kernel_size=(3,3),
-                                             padding='same',
-                                             kernel_initializer=kernel_initializer),
+                                                                          kernel_size=(3,3),
+                                                                          padding='same',
+                                                                          kernel_initializer=kernel_initializer,
+                                                                          use_bias=False),
                                              batch_norm(),
                                              tf.keras.layers.ReLU()])
 
@@ -70,26 +73,19 @@ class Fpn(tf.keras.Model):
 
 
 
-        self.conv_2_1 = tf.keras.layers.Conv2D(filters=dims_list[1],
-                                               kernel_size=(1, 1),
-                                               padding='same',
-                                               kernel_initializer=kernel_initializer
-                                               )
-        self.conv_1_1 = tf.keras.layers.Conv2D(filters=dims_list[1],
-                                               kernel_size=(1, 1),
-                                               padding='same',
-                                               kernel_initializer=kernel_initializer
-                                               )
+
 
         self.conv_1_0 = tf.keras.layers.Conv2D(filters=dims_list[0],
                                                kernel_size=(1, 1),
                                                padding='same',
-                                               kernel_initializer=kernel_initializer
+                                               kernel_initializer=kernel_initializer,
+
                                                )
         self.conv_0_0 = tf.keras.layers.Conv2D(filters=dims_list[0],
                                                kernel_size=(1, 1),
                                                padding='same',
-                                               kernel_initializer=kernel_initializer
+                                               kernel_initializer=kernel_initializer,
+
                                                )
 
         self.upsample=tf.keras.layers.UpSampling2D()
@@ -100,10 +96,9 @@ class Fpn(tf.keras.Model):
 
         of1,of2,of3,of4=fms
 
+        upsample = self.conv_0_0(of2)
 
-        upsample = self.conv_2_1(of2)
-
-        lateral = self.conv_1_1(of1)
+        lateral = self.conv_1_0(of1)
         fpn1 = self.upsample_product(upsample, lateral)
 
 
@@ -131,14 +126,16 @@ class MaxOut(tf.keras.Model):
                                              kernel_size=(3, 3),
                                              strides=1,
                                              padding='same',
-                                             kernel_initializer=kernel_initializer
+                                             kernel_initializer=kernel_initializer,
+                                             use_bias=False
                                              )
 
         self.pos_conv = tf.keras.layers.Conv2D(filters=self.num_predict_per_level,
                                                kernel_size=(3, 3),
                                                strides=1,
                                                padding='same',
-                                               kernel_initializer=kernel_initializer
+                                               kernel_initializer=kernel_initializer,
+                                               use_bias=False
                                                )
 
 
@@ -163,16 +160,17 @@ class Extra(tf.keras.Model):
         self.extra_conv1=tf.keras.Sequential([tf.keras.layers.Conv2D(filters=128,
                                                                      kernel_size=(1, 1),
                                                                      padding='same',
-                                                                     kernel_initializer=kernel_initializer
-                                                                     ),
+                                                                     kernel_initializer=kernel_initializer,
+                                                                     use_bias=False),
                                                 batch_norm(),
                                                 tf.keras.layers.ReLU(),
 
                                                 tf.keras.layers.SeparableConv2D(filters=256,
-                                                                               kernel_size=(3, 3),
-                                                                               strides=2,
-                                                                               padding='same',
-                                                                               kernel_initializer=kernel_initializer),
+                                                                                kernel_size=(3, 3),
+                                                                                strides=2,
+                                                                                padding='same',
+                                                                                kernel_initializer=kernel_initializer,
+                                                                                use_bias=False),
                                                 batch_norm(),
                                                 tf.keras.layers.ReLU()
                                                 ])
