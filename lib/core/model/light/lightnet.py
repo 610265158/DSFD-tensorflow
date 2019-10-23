@@ -159,17 +159,15 @@ class Lightnet(tf.keras.Model):
                  kernel_initializer='glorot_normal'):
         super(Lightnet, self).__init__()
 
-        possibilities = {'0.5': 48, '0.75': 96, '1.0': 116, '1.5': 176, '2.0': 224}
+        possibilities = {'0.5': 48, '0.6':64, '0.75': 96, '1.0': 116, '1.5': 176, '2.0': 224}
         self.initial_depth = possibilities[model_size]
 
-
-        self.init_conv_depth=int(32*float(model_size))
 
         ### stride eual to 4
         self.first_conv = tf.keras.Sequential(
 
             [
-                tf.keras.layers.Conv2D(self.init_conv_depth,
+                tf.keras.layers.Conv2D(16,
                                        kernel_size=(3, 3),
                                        strides=2,
                                        padding='same',
@@ -178,7 +176,7 @@ class Lightnet(tf.keras.Model):
                 batch_norm(),
                 tf.keras.layers.ReLU(),
 
-                tf.keras.layers.SeparableConv2D(self.init_conv_depth*2,
+                tf.keras.layers.SeparableConv2D(32,
                                                kernel_size=(3, 3),
                                                strides=2,
                                                padding='same',
@@ -191,13 +189,13 @@ class Lightnet(tf.keras.Model):
 
 
         self.block1 = LightnetBlock(self.initial_depth,
-                                     repeat=2,
+                                     repeat=3,
                                      kernel_initializer=kernel_initializer)
         self.block2 = LightnetBlock(self.initial_depth * 2,
-                                     repeat=4,
+                                     repeat=3,
                                      kernel_initializer=kernel_initializer)
         self.block3 = LightnetBlock(self.initial_depth * 2 *2 ,
-                                     repeat=4,
+                                     repeat=3,
                                      kernel_initializer=kernel_initializer)
 
 

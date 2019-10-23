@@ -65,7 +65,7 @@ config.ANCHOR.AVG_MATCHES=20
 config.ANCHOR.super_match=True
 
 config.MODEL = edict()
-config.MODEL.net_structure='Lightnet_0.5'
+config.MODEL.net_structure='Lightnet_0.6'
 config.MODEL.model_path = './model/'  # save directory
 config.MODEL.pretrained_model=None
 config.MODEL.fpn_dims=[96,96,96*2,96*2]
