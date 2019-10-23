@@ -159,7 +159,7 @@ class Lightnet(tf.keras.Model):
                  kernel_initializer='glorot_normal'):
         super(Lightnet, self).__init__()
 
-        possibilities = {'0.5': 48, '0.6':64, '0.75': 96, '1.0': 116, '1.5': 176, '2.0': 224}
+        possibilities = {'0.5': 48, '0.75': 96, '1.0': 116, '1.5': 176, '2.0': 224}
         self.initial_depth = possibilities[model_size]
 
 
@@ -189,13 +189,13 @@ class Lightnet(tf.keras.Model):
 
 
         self.block1 = LightnetBlock(self.initial_depth,
-                                     repeat=3,
+                                     repeat=4,
                                      kernel_initializer=kernel_initializer)
         self.block2 = LightnetBlock(self.initial_depth * 2,
-                                     repeat=3,
+                                     repeat=4,
                                      kernel_initializer=kernel_initializer)
         self.block3 = LightnetBlock(self.initial_depth * 2 *2 ,
-                                     repeat=3,
+                                     repeat=4,
                                      kernel_initializer=kernel_initializer)
 
 

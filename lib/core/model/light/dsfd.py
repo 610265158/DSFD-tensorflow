@@ -70,7 +70,6 @@ class Fpn(tf.keras.Model):
 
 
 
-
         self.conv_2_1 = tf.keras.layers.Conv2D(filters=dims_list[1],
                                                kernel_size=(1, 1),
                                                padding='same',
@@ -108,7 +107,7 @@ class Fpn(tf.keras.Model):
         fpn1 = self.upsample_product(upsample, lateral)
 
 
-        return [fpn1,of2,of3,of4]
+        return [fpn1,upsample,of3,of4]
 
 
 
@@ -177,25 +176,6 @@ class Extra(tf.keras.Model):
                                                 batch_norm(),
                                                 tf.keras.layers.ReLU()
                                                 ])
-
-        # self.extra_conv2=tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=128,
-        #                                                              kernel_size=(1, 1),
-        #                                                              padding='same',
-        #                                                              kernel_initializer=kernel_initializer),
-        #                                         tf.keras.layers.ReLU(),
-        #                                         tf.keras.layers.SeparableConv2D(filters=256,
-        #                                                                kernel_size=(3, 3),
-        #                                                                strides=2,
-        #                                                                padding='same',
-        #                                                                kernel_initializer=kernel_initializer
-        #                                                                ),
-        #                                         tf.keras.layers.ReLU()
-        #                                         ])
-
-
-
-
-
 
 
 
@@ -283,7 +263,7 @@ class DSFD(tf.keras.Model):
 
         if cfg.MODEL.cpm:
             self.cpm_ops = [CPM(kernel_initializer=kernel_initializer)
-                            for i in range(len(cfg.MODEL.fpn_dims)-2)]
+                            for i in range(len(cfg.MODEL.fpn_dims))]
 
         if cfg.MODEL.dual_mode:
             self.ssd_head_origin=SSDHead(ratio_per_pixel=1,
@@ -323,7 +303,7 @@ class DSFD(tf.keras.Model):
 
 
         if cfg.MODEL.cpm:
-            for i in range(len(fpn_fms)-2):
+            for i in range(len(fpn_fms)):
                 fpn_fms[i] = self.cpm_ops[i](fpn_fms[i], training=training)
 
         fpn_reg,fpn_cls=self.ssd_head_fem(fpn_fms,training=training)
@@ -356,7 +336,7 @@ class DSFD(tf.keras.Model):
 
 
         if cfg.MODEL.cpm:
-            for i in range(len(fpn_fms)-2):
+            for i in range(len(fpn_fms)):
                 print(fpn_fms[i].shape)
                 fpn_fms[i] = self.cpm_ops[i](fpn_fms[i], training=False)
 

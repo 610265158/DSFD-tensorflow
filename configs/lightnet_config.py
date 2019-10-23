@@ -65,14 +65,14 @@ config.ANCHOR.AVG_MATCHES=20
 config.ANCHOR.super_match=True
 
 config.MODEL = edict()
-config.MODEL.net_structure='Lightnet_0.6'
+config.MODEL.net_structure='Lightnet_0.5'
 config.MODEL.model_path = './model/'  # save directory
 config.MODEL.pretrained_model=None
-config.MODEL.fpn_dims=[96,96,96*2,96*2]
+config.MODEL.fpn_dims=[128,128,96*2,256]
 config.MODEL.cpm_dims=256
 config.MODEL.cpm_level=1
 
-config.MODEL.fpn=False
+config.MODEL.fpn=True      ###it's a low level fpn
 config.MODEL.cpm=False
 config.MODEL.dual_mode=False
 config.MODEL.maxout=False
