@@ -175,13 +175,29 @@ class Extra(tf.keras.Model):
                                                 tf.keras.layers.ReLU()
                                                 ])
 
+        self.extra_conv2 = tf.keras.Sequential([tf.keras.layers.Conv2D(filters=128,
+                                                                       kernel_size=(1, 1),
+                                                                       padding='same',
+                                                                       kernel_initializer=kernel_initializer,
+                                                                       use_bias=False),
+                                                batch_norm(),
+                                                tf.keras.layers.ReLU(),
 
+                                                tf.keras.layers.SeparableConv2D(filters=256,
+                                                                                kernel_size=(3, 3),
+                                                                                strides=2,
+                                                                                padding='same',
+                                                                                kernel_initializer=kernel_initializer,
+                                                                                use_bias=False),
+                                                batch_norm(),
+                                                tf.keras.layers.ReLU()
+                                                ])
 
     def __call__(self, x,training):
 
-        x=self.extra_conv1(x,training=training)
-
-        return x
+        x1=self.extra_conv1(x,training=training)
+        x2 = self.extra_conv2(x1, training=training)
+        return x1,x2
 class SSDHead(tf.keras.Model):
     def __init__(self,
                  ratio_per_pixel=None,
@@ -282,9 +298,9 @@ class DSFD(tf.keras.Model):
 
         x=self.preprocess(images)
 
-        of1,of2,of3=self.base_model(x,training=training)
+        of1,of2=self.base_model(x,training=training)
 
-        of4=self.extra(of3, training=training)
+        of3,of4=self.extra(of2, training=training)
 
         fms=[of1,of2,of3,of4]
 
@@ -319,9 +335,9 @@ class DSFD(tf.keras.Model):
 
         x = self.preprocess(images)
 
-        of1, of2, of3 = self.base_model(x, training=False)
+        of1, of2 = self.base_model(x, training=False)
 
-        of4 = self.extra(of3, training=False)
+        of3, of4 = self.extra(of2, training=False)
 
         fms = [of1, of2, of3, of4]
 

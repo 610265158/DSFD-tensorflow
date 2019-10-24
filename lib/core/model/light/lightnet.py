@@ -211,7 +211,7 @@ class Lightnet(tf.keras.Model):
         x3=self.block3(x2, training=training)
 
 
-        return x1,x2,x3
+        return x2,x3
 
 
 
