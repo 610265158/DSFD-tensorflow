@@ -175,29 +175,12 @@ class Extra(tf.keras.Model):
                                                 tf.keras.layers.ReLU()
                                                 ])
 
-        self.extra_conv2 = tf.keras.Sequential([tf.keras.layers.Conv2D(filters=128,
-                                                                       kernel_size=(1, 1),
-                                                                       padding='same',
-                                                                       kernel_initializer=kernel_initializer,
-                                                                       use_bias=False),
-                                                batch_norm(),
-                                                tf.keras.layers.ReLU(),
-
-                                                tf.keras.layers.SeparableConv2D(filters=256,
-                                                                                kernel_size=(3, 3),
-                                                                                strides=2,
-                                                                                padding='same',
-                                                                                kernel_initializer=kernel_initializer,
-                                                                                use_bias=False),
-                                                batch_norm(),
-                                                tf.keras.layers.ReLU()
-                                                ])
 
     def __call__(self, x,training):
 
         x1=self.extra_conv1(x,training=training)
-        x2 = self.extra_conv2(x1, training=training)
-        return x1,x2
+
+        return x1
 class SSDHead(tf.keras.Model):
     def __init__(self,
                  ratio_per_pixel=None,
@@ -281,16 +264,16 @@ class DSFD(tf.keras.Model):
 
         if cfg.MODEL.dual_mode:
             self.ssd_head_origin=SSDHead(ratio_per_pixel=1,
-                                         fm_levels=4,
+                                         fm_levels=3,
                                          kernel_initializer=kernel_initializer)
 
             self.ssd_head_fem = SSDHead(ratio_per_pixel=1,
-                                        fm_levels=4,
+                                        fm_levels=3,
                                         kernel_initializer=kernel_initializer)
 
         else:
             self.ssd_head_fem = SSDHead(ratio_per_pixel=2,
-                                        fm_levels=4,
+                                        fm_levels=3,
                                         kernel_initializer=kernel_initializer)
 
 
@@ -300,9 +283,9 @@ class DSFD(tf.keras.Model):
 
         of1,of2=self.base_model(x,training=training)
 
-        of3,of4=self.extra(of2, training=training)
+        of3=self.extra(of2, training=training)
 
-        fms=[of1,of2,of3,of4]
+        fms=[of1,of2,of3]
 
         if cfg.MODEL.dual_mode:
             o_reg, o_cls=self.ssd_head_origin(fms,training=training)
@@ -325,7 +308,7 @@ class DSFD(tf.keras.Model):
         return o_reg,o_cls,fpn_reg,fpn_cls
 
 
-    @tf.function(input_signature=[tf.TensorSpec([None, None, None, 3], tf.float32),
+    @tf.function(input_signature=[tf.TensorSpec([None, 320, 320, 3], tf.float32),
                                   tf.TensorSpec(None, tf.float32),
                                   tf.TensorSpec(None, tf.float32)
                                   ])
@@ -337,11 +320,12 @@ class DSFD(tf.keras.Model):
 
         of1, of2 = self.base_model(x, training=False)
 
-        of3, of4 = self.extra(of2, training=False)
+        of3 = self.extra(of2, training=False)
 
-        fms = [of1, of2, of3, of4]
+        fms = [of1, of2, of3]
 
-
+        for i in range(len(fms)):
+            print(fms[i].shape)
 
         if cfg.MODEL.fpn:
             fpn_fms = self.fpn(fms, training = False)
