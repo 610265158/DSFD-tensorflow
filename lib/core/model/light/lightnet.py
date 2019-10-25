@@ -189,13 +189,13 @@ class Lightnet(tf.keras.Model):
 
 
         self.block1 = LightnetBlock(self.initial_depth,
-                                     repeat=4,
+                                     repeat=3,
                                      kernel_initializer=kernel_initializer)
         self.block2 = LightnetBlock(self.initial_depth * 2,
-                                     repeat=4,
+                                     repeat=3,
                                      kernel_initializer=kernel_initializer)
         self.block3 = LightnetBlock(self.initial_depth * 2 *2 ,
-                                     repeat=4,
+                                     repeat=3,
                                      kernel_initializer=kernel_initializer)
 
 

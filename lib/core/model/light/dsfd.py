@@ -181,6 +181,7 @@ class Extra(tf.keras.Model):
         x1=self.extra_conv1(x,training=training)
 
         return x1
+
 class SSDHead(tf.keras.Model):
     def __init__(self,
                  ratio_per_pixel=None,
@@ -194,25 +195,18 @@ class SSDHead(tf.keras.Model):
             self.num_predict_per_level = ratio_per_pixel
 
         self.conv_reg = [tf.keras.layers.Conv2D(filters=self.num_predict_per_level * 4,
-                                                kernel_size=(3, 3),
+                                                kernel_size=(1, 1),
                                                 padding='same',
                                                 kernel_initializer=kernel_initializer
                                                 ) for i in range(fm_levels)]
 
-        if cfg.MODEL.maxout:
-            self.conv_cls = [tf.keras.layers.Conv2D(filters=self.num_predict_per_level * cfg.DATA.num_class,
-                                                    kernel_size=(3, 3),
-                                                    padding='same',
-                                                    kernel_initializer=kernel_initializer
-                                                    ) for i in range(fm_levels-1)]
-            self.conv_cls.insert(0,MaxOut(ratio_per_pixel=self.num_predict_per_level))
-        else:
-            self.conv_cls = [
-                tf.keras.layers.Conv2D(filters=self.num_predict_per_level * cfg.DATA.num_class,
-                                       kernel_size=(3, 3),
-                                       padding='same',
-                                       kernel_initializer=kernel_initializer
-                                       ) for i in range(fm_levels)]
+
+        self.conv_cls = [
+            tf.keras.layers.Conv2D(filters=self.num_predict_per_level * cfg.DATA.num_class,
+                                   kernel_size=(1, 1),
+                                   padding='same',
+                                   kernel_initializer=kernel_initializer
+                                   ) for i in range(fm_levels)]
 
     def call(self,fms,training):
         cla_set = []
