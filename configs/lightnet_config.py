@@ -68,7 +68,7 @@ config.MODEL = edict()
 config.MODEL.net_structure='Lightnet_0.5'
 config.MODEL.model_path = './model/'  # save directory
 config.MODEL.pretrained_model=None
-config.MODEL.fpn_dims=[128,128,128]
+config.MODEL.fpn_dims=[128,128,256]
 config.MODEL.cpm_dims=256
 
 config.MODEL.fpn=True      ###it's a low level fpn

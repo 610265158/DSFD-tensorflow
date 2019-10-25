@@ -69,22 +69,6 @@ class Fpn(tf.keras.Model):
         dims_list = cfg.MODEL.fpn_dims
 
 
-
-
-
-        self.conv_2_0 = tf.keras.layers.Conv2D(filters=dims_list[1],
-                                               kernel_size=(1, 1),
-                                               padding='same',
-                                               kernel_initializer=kernel_initializer
-                                               )
-
-        self.conv_2_1 = tf.keras.layers.Conv2D(filters=dims_list[1],
-                                               kernel_size=(1, 1),
-                                               padding='same',
-                                               kernel_initializer=kernel_initializer,
-                                               )
-
-
         self.conv_1_0 = tf.keras.layers.Conv2D(filters=dims_list[0],
                                                kernel_size=(1, 1),
                                                padding='same',
@@ -105,18 +89,15 @@ class Fpn(tf.keras.Model):
 
         of1,of2,of3=fms
 
-        upsample_3 = self.conv_2_0(of3)
 
-        lateral_2 = self.conv_2_1(of2)
-        fpn2 = self.upsample_add(upsample_3, lateral_2)
 
-        upsample_2 = self.conv_1_0(fpn2)
+        upsample_2 = self.conv_1_0(of2)
 
         lateral_1 = self.conv_1_1(of1)
         fpn1 = self.upsample_add(upsample_2, lateral_1)
 
 
-        return [fpn1,fpn2,upsample_3]
+        return [fpn1,upsample_2,of3]
 
 
 
@@ -184,7 +165,7 @@ class Extra(tf.keras.Model):
                                                 batch_norm(),
                                                 tf.keras.layers.ReLU(),
 
-                                                tf.keras.layers.SeparableConv2D(filters=128,
+                                                tf.keras.layers.SeparableConv2D(filters=256,
                                                                                 kernel_size=(3, 3),
                                                                                 strides=2,
                                                                                 padding='same',
