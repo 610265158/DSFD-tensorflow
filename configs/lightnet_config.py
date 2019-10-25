@@ -17,7 +17,7 @@ config.TRAIN.log_interval = 100
 config.TRAIN.epoch = 250
 
 config.TRAIN.lr_value_every_epoch = [0.00001,0.0001,0.001,0.0001,0.00001,0.000001]          ####lr policy
-config.TRAIN.lr_decay_every_epoch = [1,2,100,150,200]
+config.TRAIN.lr_decay_every_epoch = [1,2,120,160,200]
 
 config.TRAIN.weight_decay_factor = 5.e-4                  ##l2 regular
 config.TRAIN.vis=False                                    ##check data flag
@@ -39,11 +39,11 @@ config.DATA.val_txt_path='val.txt'
 config.DATA.num_category=1                                  ###face 1  voc 20 coco 80
 config.DATA.num_class = config.DATA.num_category + 1        # +1 background
 
-config.DATA.PIXEL_MEAN = [123., 116., 103.]                 ###rgb
-config.DATA.PIXEL_STD = [58., 57., 57.]
+config.DATA.PIXEL_MEAN = [127., 127., 127.]                 ###rgb
+config.DATA.PIXEL_STD = [127., 127., 127.]
 
-config.DATA.hin = 512  # input size
-config.DATA.win = 512
+config.DATA.hin = 416  # input size
+config.DATA.win = 416
 config.DATA.max_size=[config.DATA.hin,config.DATA.win]  ##h,w
 config.DATA.cover_small_face=10                          ###cover the small faces
 
@@ -57,7 +57,7 @@ config.ANCHOR.rect=True
 config.ANCHOR.rect_longer=True       ####    make anchor h/w=1.5
 config.ANCHOR.ANCHOR_STRIDE = 16
 config.ANCHOR.ANCHOR_SIZES = (32, 96, 384)   # sqrtarea of the anchor box
-config.ANCHOR.ANCHOR_STRIDES = ( 16, 32, 64)    # strides for each FPN level. Must be the same length as ANCHOR_SIZES
+config.ANCHOR.ANCHOR_STRIDES = (16, 32, 64)    # strides for each FPN level. Must be the same length as ANCHOR_SIZES
 config.ANCHOR.ANCHOR_RATIOS = (1., 4.) ######           1:2 in size,
 config.ANCHOR.POSITIVE_ANCHOR_THRESH = 0.35
 config.ANCHOR.NEGATIVE_ANCHOR_THRESH = 0.35

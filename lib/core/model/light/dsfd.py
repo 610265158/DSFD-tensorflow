@@ -420,7 +420,7 @@ if __name__=='__main__':
     import time
     model=DSFD()
 
-    image = np.zeros(shape=(1, 320, 320, 3), dtype=np.float32)
+    image = np.zeros(shape=(1, 240, 320, 3), dtype=np.float32)
 
     model.inference(image,0.5,0.45)
 
