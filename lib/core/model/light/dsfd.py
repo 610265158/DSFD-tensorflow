@@ -32,8 +32,7 @@ class CPM(tf.keras.Model):
                                                                padding='same',
                                                                kernel_initializer=kernel_initializer,
                                                                use_bias=False),
-                                           batch_norm(),
-                                           tf.keras.layers.ReLU()])
+                                           batch_norm()])
 
 
 
@@ -42,8 +41,7 @@ class CPM(tf.keras.Model):
                                                                           padding='same',
                                                                           kernel_initializer=kernel_initializer,
                                                                           use_bias=False),
-                                             batch_norm(),
-                                             tf.keras.layers.ReLU()])
+                                             batch_norm()])
 
 
         self.conv3 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
@@ -51,8 +49,7 @@ class CPM(tf.keras.Model):
                                                                           padding='same',
                                                                           kernel_initializer=kernel_initializer,
                                                                           use_bias=False),
-                                             batch_norm(),
-                                             tf.keras.layers.ReLU()])
+                                             batch_norm()])
 
 
     def call(self, x,training):
@@ -63,7 +60,7 @@ class CPM(tf.keras.Model):
 
         cpm3 =self.conv3(cpm2,training=training)
 
-        return tf.concat([cpm1,cpm2,cpm3],axis=3)
+        return tf.nn.relu(tf.concat([cpm1,cpm2,cpm3],axis=3))
 
 class Fpn(tf.keras.Model):
     def __init__(self,kernel_initializer='glorot_normal'):
@@ -75,17 +72,29 @@ class Fpn(tf.keras.Model):
 
 
 
+        self.conv_2_0 = tf.keras.layers.Conv2D(filters=dims_list[1],
+                                               kernel_size=(1, 1),
+                                               padding='same',
+                                               kernel_initializer=kernel_initializer
+                                               )
+
+        self.conv_2_1 = tf.keras.layers.Conv2D(filters=dims_list[1],
+                                               kernel_size=(1, 1),
+                                               padding='same',
+                                               kernel_initializer=kernel_initializer,
+                                               )
+
+
         self.conv_1_0 = tf.keras.layers.Conv2D(filters=dims_list[0],
                                                kernel_size=(1, 1),
                                                padding='same',
                                                kernel_initializer=kernel_initializer,
 
                                                )
-        self.conv_0_0 = tf.keras.layers.Conv2D(filters=dims_list[0],
+        self.conv_1_1 = tf.keras.layers.Conv2D(filters=dims_list[0],
                                                kernel_size=(1, 1),
                                                padding='same',
                                                kernel_initializer=kernel_initializer,
-
                                                )
 
         self.upsample=tf.keras.layers.UpSampling2D()
@@ -94,15 +103,20 @@ class Fpn(tf.keras.Model):
     def __call__(self, fms,training):
 
 
-        of1,of2,of3,of4=fms
+        of1,of2,of3=fms
 
-        upsample = self.conv_0_0(of2)
+        upsample_3 = self.conv_2_0(of3)
 
-        lateral = self.conv_1_0(of1)
-        fpn1 = self.upsample_product(upsample, lateral)
+        lateral_2 = self.conv_2_1(of2)
+        fpn2 = self.upsample_add(upsample_3, lateral_2)
+
+        upsample_2 = self.conv_1_0(fpn2)
+
+        lateral_1 = self.conv_1_1(of1)
+        fpn1 = self.upsample_add(upsample_2, lateral_1)
 
 
-        return [fpn1,upsample,of3,of4]
+        return [fpn1,fpn2,upsample_3]
 
 
 
@@ -110,6 +124,11 @@ class Fpn(tf.keras.Model):
 
         x_upsample=self.upsample(x)
         return x_upsample*y
+
+    def upsample_add(self,x,y):
+
+        x_upsample=self.upsample(x)
+        return x_upsample+y
 
 class MaxOut(tf.keras.Model):
     def __init__(self,
@@ -165,7 +184,7 @@ class Extra(tf.keras.Model):
                                                 batch_norm(),
                                                 tf.keras.layers.ReLU(),
 
-                                                tf.keras.layers.SeparableConv2D(filters=256,
+                                                tf.keras.layers.SeparableConv2D(filters=128,
                                                                                 kernel_size=(3, 3),
                                                                                 strides=2,
                                                                                 padding='same',
@@ -201,12 +220,11 @@ class SSDHead(tf.keras.Model):
                                                 ) for i in range(fm_levels)]
 
 
-        self.conv_cls = [
-            tf.keras.layers.Conv2D(filters=self.num_predict_per_level * cfg.DATA.num_class,
-                                   kernel_size=(1, 1),
-                                   padding='same',
-                                   kernel_initializer=kernel_initializer
-                                   ) for i in range(fm_levels)]
+        self.conv_cls = [tf.keras.layers.Conv2D(filters=self.num_predict_per_level * cfg.DATA.num_class,
+                                                kernel_size=(1, 1),
+                                                padding='same',
+                                                kernel_initializer=kernel_initializer
+                                                ) for i in range(fm_levels)]
 
     def call(self,fms,training):
         cla_set = []
@@ -414,7 +432,7 @@ if __name__=='__main__':
     import time
     model=DSFD()
 
-    image = np.zeros(shape=(1, 240, 320, 3), dtype=np.float32)
+    image = np.zeros(shape=(1, 320, 320, 3), dtype=np.float32)
 
     model.inference(image,0.5,0.45)
 
