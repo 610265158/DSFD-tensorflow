@@ -57,19 +57,12 @@ class basic_unit(tf.keras.Model):
                         batch_norm(),
                         tf.keras.layers.ReLU(),
 
-                        tf.keras.layers.DepthwiseConv2D(kernel_size=(3, 3),
+                        tf.keras.layers.SeparableConv2D(output_size,
+                                                        kernel_size=(3, 3),
                                                         strides=1,
                                                         padding='same',
                                                         use_bias=False,
-                                                        depthwise_initializer=kernel_initializer),
-                        batch_norm(),
-
-                        tf.keras.layers.Conv2D(output_size,
-                                               kernel_size=(1, 1),
-                                               strides=1,
-                                               padding='same',
-                                               use_bias=False,
-                                               kernel_initializer=kernel_initializer),
+                                                        kernel_initializer=kernel_initializer),
                         batch_norm(),
                         tf.keras.layers.ReLU()
                     ]
@@ -98,19 +91,12 @@ class basic_unit_with_downsampling(tf.keras.Model):
                 batch_norm(),
                 tf.keras.layers.ReLU(),
 
-                tf.keras.layers.DepthwiseConv2D(kernel_size=(5, 5),
+                tf.keras.layers.SeparableConv2D(output_size,
+                                                kernel_size=(5, 5),
                                                 strides=2,
                                                 padding='same',
                                                 use_bias=False,
-                                                depthwise_initializer=kernel_initializer),
-                batch_norm(),
-
-                tf.keras.layers.Conv2D(output_size,
-                                       kernel_size=(1, 1),
-                                       strides=1,
-                                       padding='same',
-                                       use_bias=False,
-                                       kernel_initializer=kernel_initializer),
+                                                kernel_initializer=kernel_initializer),
                 batch_norm(),
                 tf.keras.layers.ReLU()
             ]
@@ -118,19 +104,12 @@ class basic_unit_with_downsampling(tf.keras.Model):
 
         self.project_branch = tf.keras.Sequential(
 
-            [tf.keras.layers.DepthwiseConv2D(kernel_size=(5, 5),
+            [ tf.keras.layers.SeparableConv2D(output_size,
+                                                kernel_size=(5, 5),
                                                 strides=2,
                                                 padding='same',
                                                 use_bias=False,
-                                                depthwise_initializer=kernel_initializer),
-                batch_norm(),
-
-                tf.keras.layers.Conv2D(output_size,
-                                       kernel_size=(1, 1),
-                                       strides=1,
-                                       padding='same',
-                                       use_bias=False,
-                                       kernel_initializer=kernel_initializer),
+                                                kernel_initializer=kernel_initializer),
                 batch_norm(),
                 tf.keras.layers.ReLU()
              ]
