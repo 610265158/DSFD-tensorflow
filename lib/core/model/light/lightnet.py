@@ -118,7 +118,7 @@ class basic_unit_with_downsampling(tf.keras.Model):
 
         self.project_branch = tf.keras.Sequential(
 
-            [tf.keras.layers.DepthwiseConv2D(kernel_size=(3, 3),
+            [tf.keras.layers.DepthwiseConv2D(kernel_size=(5, 5),
                                                 strides=2,
                                                 padding='same',
                                                 use_bias=False,
