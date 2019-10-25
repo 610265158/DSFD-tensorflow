@@ -317,18 +317,13 @@ class DSFD(tf.keras.Model):
 
         fms = [of1, of2, of3]
 
-        for i in range(len(fms)):
-            print(fms[i].shape)
-
         if cfg.MODEL.fpn:
             fpn_fms = self.fpn(fms, training = False)
         else:
             fpn_fms=fms
 
-
         if cfg.MODEL.cpm:
             for i in range(len(fpn_fms)):
-                print(fpn_fms[i].shape)
                 fpn_fms[i] = self.cpm_ops[i](fpn_fms[i], training=False)
 
 

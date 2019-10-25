@@ -1,5 +1,9 @@
 import tensorflow as tf
 
+
+
+from tensorflow_core.python.layers.pooling import MaxPooling2D
+
 def batch_norm():
     return tf.keras.layers.BatchNormalization(fused=True,
                                               momentum=0.997,
@@ -53,12 +57,19 @@ class basic_unit(tf.keras.Model):
                         batch_norm(),
                         tf.keras.layers.ReLU(),
 
-                        tf.keras.layers.SeparableConv2D(output_size,
-                                                        kernel_size=(3, 3),
+                        tf.keras.layers.DepthwiseConv2D(kernel_size=(3, 3),
                                                         strides=1,
                                                         padding='same',
                                                         use_bias=False,
-                                                        kernel_initializer=kernel_initializer),
+                                                        depthwise_initializer=kernel_initializer),
+                        batch_norm(),
+
+                        tf.keras.layers.Conv2D(output_size,
+                                               kernel_size=(1, 1),
+                                               strides=1,
+                                               padding='same',
+                                               use_bias=False,
+                                               kernel_initializer=kernel_initializer),
                         batch_norm(),
                         tf.keras.layers.ReLU()
                     ]
@@ -87,12 +98,19 @@ class basic_unit_with_downsampling(tf.keras.Model):
                 batch_norm(),
                 tf.keras.layers.ReLU(),
 
-                tf.keras.layers.SeparableConv2D(output_size,
-                                                kernel_size=(3, 3),
+                tf.keras.layers.DepthwiseConv2D(kernel_size=(5, 5),
                                                 strides=2,
                                                 padding='same',
                                                 use_bias=False,
-                                                kernel_initializer=kernel_initializer),
+                                                depthwise_initializer=kernel_initializer),
+                batch_norm(),
+
+                tf.keras.layers.Conv2D(output_size,
+                                       kernel_size=(1, 1),
+                                       strides=1,
+                                       padding='same',
+                                       use_bias=False,
+                                       kernel_initializer=kernel_initializer),
                 batch_norm(),
                 tf.keras.layers.ReLU()
             ]
@@ -100,14 +118,22 @@ class basic_unit_with_downsampling(tf.keras.Model):
 
         self.project_branch = tf.keras.Sequential(
 
-            [tf.keras.layers.SeparableConv2D(output_size,
-                                            kernel_size=(3, 3),
-                                            strides=2,
-                                            padding='same',
-                                            use_bias=False,
-                                            kernel_initializer=kernel_initializer),
-            batch_norm(),
-            tf.keras.layers.ReLU()]
+            [tf.keras.layers.DepthwiseConv2D(kernel_size=(3, 3),
+                                                strides=2,
+                                                padding='same',
+                                                use_bias=False,
+                                                depthwise_initializer=kernel_initializer),
+                batch_norm(),
+
+                tf.keras.layers.Conv2D(output_size,
+                                       kernel_size=(1, 1),
+                                       strides=1,
+                                       padding='same',
+                                       use_bias=False,
+                                       kernel_initializer=kernel_initializer),
+                batch_norm(),
+                tf.keras.layers.ReLU()
+             ]
         )
 
 
@@ -176,26 +202,28 @@ class Lightnet(tf.keras.Model):
                 batch_norm(),
                 tf.keras.layers.ReLU(),
 
-                tf.keras.layers.SeparableConv2D(32,
-                                               kernel_size=(3, 3),
-                                               strides=2,
-                                               padding='same',
-                                               use_bias=False,
-                                               kernel_initializer=kernel_initializer),
-                batch_norm(),
-                tf.keras.layers.ReLU()
+                tf.keras.layers.MaxPooling2D(pool_size=(3, 3),
+                                          strides=2)
+                # tf.keras.layers.SeparableConv2D(32,
+                #                                kernel_size=(3, 3),
+                #                                strides=2,
+                #                                padding='same',
+                #                                use_bias=False,
+                #                                kernel_initializer=kernel_initializer),
+                # batch_norm(),
+                # tf.keras.layers.ReLU()
             ]
             )
 
 
         self.block1 = LightnetBlock(self.initial_depth,
-                                     repeat=3,
+                                     repeat=2,
                                      kernel_initializer=kernel_initializer)
         self.block2 = LightnetBlock(self.initial_depth * 2,
-                                     repeat=3,
+                                     repeat=4,
                                      kernel_initializer=kernel_initializer)
         self.block3 = LightnetBlock(self.initial_depth * 2 ,
-                                     repeat=3,
+                                     repeat=2,
                                      kernel_initializer=kernel_initializer)
 
 
