@@ -16,8 +16,8 @@ config.TRAIN.batch_size = 32                     ###A big batch size may achieve
 config.TRAIN.log_interval = 100
 config.TRAIN.epoch = 250
 
-config.TRAIN.lr_value_every_epoch = [0.0001,0.00001,0.000001]          ####lr policy
-config.TRAIN.lr_decay_every_epoch = [50,100]
+config.TRAIN.lr_value_every_epoch = [0.00001,0.0001,0.001,0.0001,0.00001,0.000001]          ####lr policy
+config.TRAIN.lr_decay_every_epoch = [1,2,120,160,200]
 
 config.TRAIN.weight_decay_factor = 5.e-4                  ##l2 regular
 config.TRAIN.vis=False                                    ##check data flag
