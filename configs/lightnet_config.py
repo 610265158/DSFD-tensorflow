@@ -25,10 +25,8 @@ config.TRAIN.opt='Adam'
 config.TRAIN.mix_precision=False
 
 config.TEST = edict()
-config.TEST.parallel_iterations=8
 config.TEST.score_thres = 0.05
 config.TEST.iou_thres = 0.3
-config.TEST.max_detect = 800
 
 
 
@@ -42,12 +40,12 @@ config.DATA.num_class = config.DATA.num_category + 1        # +1 background
 config.DATA.PIXEL_MEAN = [127., 127., 127.]                 ###rgb
 config.DATA.PIXEL_STD = [127., 127., 127.]
 
-config.DATA.hin = 416  # input size
-config.DATA.win = 416
+config.DATA.hin = 512  # input size
+config.DATA.win = 512
 config.DATA.max_size=[config.DATA.hin,config.DATA.win]  ##h,w
 config.DATA.cover_small_face=10                          ###cover the small faces
 
-config.DATA.mutiscale=False                #if muti scale set False  then config.DATA.MAX_SIZE will be the inputsize
+config.DATA.mutiscale=True                #if muti scale set False  then config.DATA.MAX_SIZE will be the inputsize
 config.DATA.scales=(320,640)
 
 
@@ -56,9 +54,9 @@ config.ANCHOR = edict()
 config.ANCHOR.rect=True
 config.ANCHOR.rect_longer=True       ####    make anchor h/w=1.5
 config.ANCHOR.ANCHOR_STRIDE = 16
-config.ANCHOR.ANCHOR_SIZES = (32, 96, 384)   # sqrtarea of the anchor box
-config.ANCHOR.ANCHOR_STRIDES = (16, 32, 64)    # strides for each FPN level. Must be the same length as ANCHOR_SIZES
-config.ANCHOR.ANCHOR_RATIOS = (1., 4.) ######           1:2 in size,
+config.ANCHOR.ANCHOR_SIZES = (32, 96, 256, 512)   # sqrtarea of the anchor box
+config.ANCHOR.ANCHOR_STRIDES = (16, 32, 64, 128)    # strides for each FPN level. Must be the same length as ANCHOR_SIZES
+config.ANCHOR.ANCHOR_RATIOS = (1., 3.) ######           1:1.7 in size,
 config.ANCHOR.POSITIVE_ANCHOR_THRESH = 0.35
 config.ANCHOR.NEGATIVE_ANCHOR_THRESH = 0.35
 config.ANCHOR.AVG_MATCHES=20
@@ -67,9 +65,9 @@ config.ANCHOR.super_match=True
 config.MODEL = edict()
 config.MODEL.net_structure='Lightnet_0.5'
 config.MODEL.model_path = './model/'  # save directory
-config.MODEL.pretrained_model=None
-config.MODEL.fpn_dims=[128,128,256]
-config.MODEL.cpm_dims=256
+config.MODEL.pretrained_model='./model/epoch_105_val_loss2.814147/variables/variables'
+config.MODEL.fpn_dims=[96,96,128,256]
+config.MODEL.cpm_dims=[128,160,192,256]
 
 config.MODEL.fpn=True      ###it's a low level fpn
 config.MODEL.cpm=True

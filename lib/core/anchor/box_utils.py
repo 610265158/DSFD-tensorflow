@@ -124,7 +124,7 @@ def decode(codes, anchors):
         x2=tx2 * anchor_widths + anchors[:,2]
         y2=ty2 * anchor_heights + anchors[:,3]
 
-        return tf.stack([y1,x1,y2,x2], axis=1)
+        return tf.stack([x1,y1,x2,y2], axis=1)
 
 
 def batch_decode(box_encodings, anchors):

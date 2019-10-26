@@ -22,10 +22,9 @@ def batch_norm():
     return tf.keras.layers.BatchNormalization(fused=True,momentum=0.997,epsilon=1e-5)
 
 class CPM(tf.keras.Model):
-    def __init__(self,kernel_initializer='glorot_normal'):
+    def __init__(self,kernel_initializer='glorot_normal',dim=256):
         super(CPM, self).__init__()
 
-        dim = cfg.MODEL.cpm_dims
 
         self.conv1=tf.keras.Sequential([tf.keras.layers.Conv2D(filters=dim//2,
                                                                kernel_size=(1,1),
@@ -87,7 +86,7 @@ class Fpn(tf.keras.Model):
     def __call__(self, fms,training):
 
 
-        of1,of2,of3=fms
+        of1,of2,of3,of4=fms
 
 
 
@@ -97,7 +96,7 @@ class Fpn(tf.keras.Model):
         fpn1 = self.upsample_add(upsample_2, lateral_1)
 
 
-        return [fpn1,upsample_2,of3]
+        return [fpn1,upsample_2,of3,of4]
 
 
 
@@ -165,6 +164,24 @@ class Extra(tf.keras.Model):
                                                 batch_norm(),
                                                 tf.keras.layers.ReLU(),
 
+                                                tf.keras.layers.SeparableConv2D(filters=128,
+                                                                                kernel_size=(3, 3),
+                                                                                strides=2,
+                                                                                padding='same',
+                                                                                kernel_initializer=kernel_initializer,
+                                                                                use_bias=False),
+                                                batch_norm(),
+                                                tf.keras.layers.ReLU()
+                                                ])
+
+        self.extra_conv2 = tf.keras.Sequential([tf.keras.layers.Conv2D(filters=128,
+                                                                       kernel_size=(1, 1),
+                                                                       padding='same',
+                                                                       kernel_initializer=kernel_initializer,
+                                                                       use_bias=False),
+                                                batch_norm(),
+                                                tf.keras.layers.ReLU(),
+
                                                 tf.keras.layers.SeparableConv2D(filters=256,
                                                                                 kernel_size=(3, 3),
                                                                                 strides=2,
@@ -180,7 +197,8 @@ class Extra(tf.keras.Model):
 
         x1=self.extra_conv1(x,training=training)
 
-        return x1
+        x2 = self.extra_conv2(x1, training=training)
+        return x1,x2
 
 class SSDHead(tf.keras.Model):
     def __init__(self,
@@ -252,21 +270,21 @@ class DSFD(tf.keras.Model):
             self.fpn=Fpn()
 
         if cfg.MODEL.cpm:
-            self.cpm_ops = [CPM(kernel_initializer=kernel_initializer)
+            self.cpm_ops = [CPM(kernel_initializer=kernel_initializer,dim=cfg.MODEL.cpm_dims[i])
                             for i in range(len(cfg.MODEL.fpn_dims))]
 
         if cfg.MODEL.dual_mode:
             self.ssd_head_origin=SSDHead(ratio_per_pixel=1,
-                                         fm_levels=3,
+                                         fm_levels=4,
                                          kernel_initializer=kernel_initializer)
 
             self.ssd_head_fem = SSDHead(ratio_per_pixel=1,
-                                        fm_levels=3,
+                                        fm_levels=4,
                                         kernel_initializer=kernel_initializer)
 
         else:
             self.ssd_head_fem = SSDHead(ratio_per_pixel=2,
-                                        fm_levels=3,
+                                        fm_levels=4,
                                         kernel_initializer=kernel_initializer)
 
 
@@ -276,9 +294,9 @@ class DSFD(tf.keras.Model):
 
         of1,of2=self.base_model(x,training=training)
 
-        of3=self.extra(of2, training=training)
+        of3,of4=self.extra(of2, training=training)
 
-        fms=[of1,of2,of3]
+        fms=[of1,of2,of3,of4]
 
         if cfg.MODEL.dual_mode:
             o_reg, o_cls=self.ssd_head_origin(fms,training=training)
@@ -301,21 +319,16 @@ class DSFD(tf.keras.Model):
         return o_reg,o_cls,fpn_reg,fpn_cls
 
 
-    @tf.function(input_signature=[tf.TensorSpec([None, None, None, 3], tf.float32),
-                                  tf.TensorSpec(None, tf.float32),
-                                  tf.TensorSpec(None, tf.float32)
-                                  ])
-    def inference(self, images,
-                        score_threshold=cfg.TEST.score_thres, \
-                        iou_threshold=cfg.TEST.iou_thres):
+    @tf.function(input_signature=[tf.TensorSpec([None, None, None, 3], tf.float32)])
+    def inference(self, images):
 
         x = self.preprocess(images)
 
-        of1, of2 = self.base_model(x, training=False)
+        of1,of2=self.base_model(x,training=False)
 
-        of3 = self.extra(of2, training=False)
+        of3,of4=self.extra(of2, training=False)
 
-        fms = [of1, of2, of3]
+        fms=[of1,of2,of3,of4]
 
         if cfg.MODEL.fpn:
             fpn_fms = self.fpn(fms, training = False)
@@ -324,6 +337,7 @@ class DSFD(tf.keras.Model):
 
         if cfg.MODEL.cpm:
             for i in range(len(fpn_fms)):
+
                 fpn_fms[i] = self.cpm_ops[i](fpn_fms[i], training=False)
 
 
@@ -344,7 +358,7 @@ class DSFD(tf.keras.Model):
         else:
             anchors_ = anchors_
 
-        res=self.postprocess(fpn_reg, fpn_cls, anchors_,score_threshold,iou_threshold)
+        res=self.postprocess(fpn_reg, fpn_cls, anchors_)
         return res
 
 
@@ -361,10 +375,7 @@ class DSFD(tf.keras.Model):
         image = (image - image_mean)  *image_invstd
 
         return image
-    def postprocess(self,box_encodings,cla,anchors, \
-                        score_threshold=cfg.TEST.score_thres, \
-                        iou_threshold=cfg.TEST.iou_thres,\
-                        max_boxes=cfg.TEST.max_detect):
+    def postprocess(self,box_encodings,cla,anchors):
         """Postprocess outputs of the network.
 
         Returns:
@@ -387,15 +398,13 @@ class DSFD(tf.keras.Model):
 
             scores = tf.reduce_max(scores,axis=2)
             # it has shape [batch_size, num_anchors]
+            scores = tf.expand_dims(scores, axis=-1)
+            # it has shape [batch_size, num_anchors]
+
+            res = tf.concat([boxes, scores], axis=2)
 
 
-        with tf.device('/cpu:0'), tf.name_scope('nms'):
-            boxes, scores,labels, num_detections = batch_non_max_suppression(
-                boxes, scores,labels, score_threshold, iou_threshold, max_boxes
-            )
-
-
-        return {'boxes': boxes, 'scores': scores,'labels':labels, 'num_boxes': num_detections}
+        return res
 
 
 
@@ -408,7 +417,7 @@ if __name__=='__main__':
     import time
     model=DSFD()
 
-    image = np.zeros(shape=(1, 320, 320, 3), dtype=np.float32)
+    image = np.zeros(shape=(1, 256, 320, 3), dtype=np.float32)
 
     model.inference(image,0.5,0.45)
 
