@@ -3,7 +3,6 @@ from lib.core.base_trainer.net_work import Train
 from lib.dataset.dataietr import DataIter
 
 from lib.core.model.light.dsfd import DSFD as lightnet_dsfd
-from lib.core.model.shufflenet.dsfd import DSFD as shufflenet_dsfd
 from lib.core.model.vgg.dsfd import DSFD as vgg_dsfd
 
 import tensorflow as tf

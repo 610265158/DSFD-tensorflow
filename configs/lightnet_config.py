@@ -16,8 +16,8 @@ config.TRAIN.batch_size = 32                     ###A big batch size may achieve
 config.TRAIN.log_interval = 100
 config.TRAIN.epoch = 250
 
-config.TRAIN.lr_value_every_epoch = [0.00001,0.0001,0.001,0.0001,0.00001,0.000001]          ####lr policy
-config.TRAIN.lr_decay_every_epoch = [1,2,120,160,200]
+config.TRAIN.lr_value_every_epoch = [0.0001,0.00001,0.000001]          ####lr policy
+config.TRAIN.lr_decay_every_epoch = [50,100]
 
 config.TRAIN.weight_decay_factor = 5.e-4                  ##l2 regular
 config.TRAIN.vis=False                                    ##check data flag
@@ -66,7 +66,7 @@ config.ANCHOR.super_match=True
 config.MODEL = edict()
 config.MODEL.net_structure='Lightnet_0.5'
 config.MODEL.model_path = './model/'  # save directory
-config.MODEL.pretrained_model=None
+config.MODEL.pretrained_model='./xx/variables/variables'
 config.MODEL.fpn_dims=[96,96,128,256]
 config.MODEL.cpm_dims=[128,160,192,256]
 
