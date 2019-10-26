@@ -439,10 +439,7 @@ class DSFD(tf.keras.Model):
         image = (image - image_mean)  *image_invstd
 
         return image
-    def postprocess(self,box_encodings,cla,anchors, \
-                        score_threshold=cfg.TEST.score_thres, \
-                        iou_threshold=cfg.TEST.iou_thres,\
-                        max_boxes=cfg.TEST.max_detect):
+    def postprocess(self,box_encodings,cla,anchors):
         """Postprocess outputs of the network.
 
         Returns:
@@ -455,33 +452,23 @@ class DSFD(tf.keras.Model):
         """
         with tf.name_scope('postprocessing'):
             boxes = batch_decode(box_encodings, anchors)
-            # if the images were padded we need to rescale predicted boxes:
 
-            boxes = tf.clip_by_value(boxes, 0.0, 1.0)
             # it has shape [batch_size, num_anchors, 4]
-            if 0:
-                scores = tf.nn.sigmoid(cla)[:, :, 1:]  ##ignore the bg
-            else:
-                scores = tf.nn.softmax(cla, axis=2)[:, :, 1:]  ##ignore the bg
+
+            scores = tf.nn.softmax(cla, axis=2)[:, :, 1:]  ##ignore the bg
             # it has shape [batch_size, num_anchors,class]
             labels = tf.argmax(scores,axis=2)
             # it has shape [batch_size, num_anchors]
 
             scores = tf.reduce_max(scores,axis=2)
             # it has shape [batch_size, num_anchors]
+            scores = tf.expand_dims(scores, axis=-1)
+            # it has shape [batch_size, num_anchors]
+
+            res = tf.concat([boxes, scores], axis=2)
 
 
-        with tf.device('/cpu:0'), tf.name_scope('nms'):
-            boxes, scores,labels, num_detections = batch_non_max_suppression(
-                boxes, scores,labels, score_threshold, iou_threshold, max_boxes
-            )
-
-        boxes=tf.identity(boxes,name='boxes')
-        scores = tf.identity(scores, name='scores')
-        labels = tf.identity(labels, name='labels')
-        num_detections = tf.identity(num_detections, name='num_detections')
-
-        return {'boxes': boxes, 'scores': scores, 'labels':labels,'num_boxes': num_detections}
+        return res
 
 
 if __name__=='__main__':
