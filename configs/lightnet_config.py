@@ -30,6 +30,7 @@ config.TEST.iou_thres = 0.3
 
 
 
+
 config.DATA = edict()
 config.DATA.root_path=''
 config.DATA.train_txt_path='train.txt'
@@ -65,7 +66,7 @@ config.ANCHOR.super_match=True
 config.MODEL = edict()
 config.MODEL.net_structure='Lightnet_0.5'
 config.MODEL.model_path = './model/'  # save directory
-config.MODEL.pretrained_model='./model/epoch_105_val_loss2.814147/variables/variables'
+config.MODEL.pretrained_model=None
 config.MODEL.fpn_dims=[96,96,128,256]
 config.MODEL.cpm_dims=[128,160,192,256]
 
