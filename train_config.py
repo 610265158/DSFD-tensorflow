@@ -3,7 +3,6 @@
 import os
 
 from configs.vgg_config import config as vgg_config
-from configs.SF_config import config as shufflenet_config
 from configs.lightnet_config import config as lightnet_config
 
 ##### the config for different backbone,

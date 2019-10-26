@@ -43,8 +43,6 @@ def main():
 
         if 'vgg' in cfg.MODEL.net_structure:
             model=vgg_dsfd()
-        elif 'ShuffleNet' in cfg.MODEL.net_structure:
-            model = shufflenet_dsfd()
         elif 'Lightnet' in cfg.MODEL.net_structure:
             model = lightnet_dsfd()
 
