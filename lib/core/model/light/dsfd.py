@@ -67,36 +67,70 @@ class Fpn(tf.keras.Model):
 
         dims_list = cfg.MODEL.fpn_dims
 
+        self.conv_3_2 = tf.keras.layers.Conv2D(filters=dims_list[2],
+                                               kernel_size=(1, 1),
+                                               padding='same',
+                                               kernel_initializer=kernel_initializer
+                                               )
+        self.conv_2_2 = tf.keras.layers.Conv2D(filters=dims_list[2],
+                                               kernel_size=(1, 1),
+                                               padding='same',
+                                               kernel_initializer=kernel_initializer
+                                               )
+
+
+        self.conv_2_1 = tf.keras.layers.Conv2D(filters=dims_list[1],
+                                               kernel_size=(1, 1),
+                                               padding='same',
+                                               kernel_initializer=kernel_initializer
+                                               )
+        self.conv_1_1 = tf.keras.layers.Conv2D(filters=dims_list[1],
+                                               kernel_size=(1, 1),
+                                               padding='same',
+                                               kernel_initializer=kernel_initializer
+                                               )
 
         self.conv_1_0 = tf.keras.layers.Conv2D(filters=dims_list[0],
                                                kernel_size=(1, 1),
                                                padding='same',
-                                               kernel_initializer=kernel_initializer,
-
+                                               kernel_initializer=kernel_initializer
                                                )
-        self.conv_1_1 = tf.keras.layers.Conv2D(filters=dims_list[0],
+        self.conv_0_0 = tf.keras.layers.Conv2D(filters=dims_list[0],
                                                kernel_size=(1, 1),
                                                padding='same',
-                                               kernel_initializer=kernel_initializer,
+                                               kernel_initializer=kernel_initializer
                                                )
 
         self.upsample=tf.keras.layers.UpSampling2D()
-
-
     def __call__(self, fms,training):
 
 
-        of1,of2,of3,of4=fms
+        of0,of1,of2,of3,of4,of5=fms
+
+        upsample=self.conv_3_2(of3)
+
+        lateral=self.conv_2_2(of2)
+
+        fpn2=self.upsample_product(upsample,lateral)
+
+        upsample = self.conv_2_1(fpn2)
+
+        lateral = self.conv_1_1(of1)
+        fpn1 = self.upsample_product(upsample, lateral)
+
+        upsample = self.conv_1_0(fpn1)
+
+        lateral = self.conv_0_0(of0)
+        fpn0 = self.upsample_product(upsample, lateral)
+
+        return [fpn0,fpn1,fpn2,of3,of4,of5]
 
 
 
-        upsample_2 = self.conv_1_0(of2)
+    def upsample_product(self,x,y):
 
-        lateral_1 = self.conv_1_1(of1)
-        fpn1 = self.upsample_add(upsample_2, lateral_1)
-
-
-        return [fpn1,upsample_2,of3,of4]
+        x_upsample=self.upsample(x)
+        return x_upsample*y
 
 
 
@@ -122,7 +156,7 @@ class MaxOut(tf.keras.Model):
             self.num_predict_per_level = ratio_per_pixel
 
         self.neg_conv=tf.keras.layers.Conv2D(filters=self.num_predict_per_level*3,
-                                             kernel_size=(3, 3),
+                                             kernel_size=(1, 1),
                                              strides=1,
                                              padding='same',
                                              kernel_initializer=kernel_initializer,
@@ -130,7 +164,7 @@ class MaxOut(tf.keras.Model):
                                              )
 
         self.pos_conv = tf.keras.layers.Conv2D(filters=self.num_predict_per_level,
-                                               kernel_size=(3, 3),
+                                               kernel_size=(1, 1),
                                                strides=1,
                                                padding='same',
                                                kernel_initializer=kernel_initializer,
@@ -156,7 +190,7 @@ class Extra(tf.keras.Model):
     def __init__(self,kernel_initializer='glorot_normal'):
         super(Extra, self).__init__()
 
-        self.extra_conv1=tf.keras.Sequential([tf.keras.layers.Conv2D(filters=128,
+        self.extra_conv1=tf.keras.Sequential([tf.keras.layers.Conv2D(filters=96,
                                                                      kernel_size=(1, 1),
                                                                      padding='same',
                                                                      kernel_initializer=kernel_initializer,
@@ -164,7 +198,7 @@ class Extra(tf.keras.Model):
                                                 batch_norm(),
                                                 tf.keras.layers.ReLU(),
 
-                                                tf.keras.layers.SeparableConv2D(filters=128,
+                                                tf.keras.layers.SeparableConv2D(filters=192,
                                                                                 kernel_size=(3, 3),
                                                                                 strides=2,
                                                                                 padding='same',
@@ -174,7 +208,7 @@ class Extra(tf.keras.Model):
                                                 tf.keras.layers.ReLU()
                                                 ])
 
-        self.extra_conv2 = tf.keras.Sequential([tf.keras.layers.Conv2D(filters=128,
+        self.extra_conv2 = tf.keras.Sequential([tf.keras.layers.Conv2D(filters=96,
                                                                        kernel_size=(1, 1),
                                                                        padding='same',
                                                                        kernel_initializer=kernel_initializer,
@@ -182,7 +216,7 @@ class Extra(tf.keras.Model):
                                                 batch_norm(),
                                                 tf.keras.layers.ReLU(),
 
-                                                tf.keras.layers.SeparableConv2D(filters=256,
+                                                tf.keras.layers.SeparableConv2D(filters=192,
                                                                                 kernel_size=(3, 3),
                                                                                 strides=2,
                                                                                 padding='same',
@@ -218,12 +252,21 @@ class SSDHead(tf.keras.Model):
                                                 kernel_initializer=kernel_initializer
                                                 ) for i in range(fm_levels)]
 
+        if cfg.MODEL.maxout:
+            self.conv_cls = [MaxOut(ratio_per_pixel=self.num_predict_per_level)]
 
-        self.conv_cls = [tf.keras.layers.Conv2D(filters=self.num_predict_per_level * cfg.DATA.num_class,
-                                                kernel_size=(1, 1),
-                                                padding='same',
-                                                kernel_initializer=kernel_initializer
-                                                ) for i in range(fm_levels)]
+            self.conv_cls += [tf.keras.layers.Conv2D(filters=self.num_predict_per_level * cfg.DATA.num_class,
+                                                     kernel_size=(1, 1),
+                                                     padding='same',
+                                                     kernel_initializer=kernel_initializer
+                                                     ) for i in range(fm_levels - 1)]
+        else:
+            self.conv_cls = [
+                tf.keras.layers.Conv2D(filters=self.num_predict_per_level * cfg.DATA.num_class,
+                                       kernel_size=(1, 1),
+                                       padding='same',
+                                       kernel_initializer=kernel_initializer
+                                       ) for i in range(fm_levels)]
 
     def call(self,fms,training):
         cla_set = []
@@ -275,16 +318,16 @@ class DSFD(tf.keras.Model):
 
         if cfg.MODEL.dual_mode:
             self.ssd_head_origin=SSDHead(ratio_per_pixel=1,
-                                         fm_levels=4,
+                                         fm_levels=6,
                                          kernel_initializer=kernel_initializer)
 
             self.ssd_head_fem = SSDHead(ratio_per_pixel=1,
-                                        fm_levels=4,
+                                        fm_levels=6,
                                         kernel_initializer=kernel_initializer)
 
         else:
-            self.ssd_head_fem = SSDHead(ratio_per_pixel=2,
-                                        fm_levels=4,
+            self.ssd_head_fem = SSDHead(ratio_per_pixel=1,
+                                        fm_levels=6,
                                         kernel_initializer=kernel_initializer)
 
 
@@ -292,11 +335,14 @@ class DSFD(tf.keras.Model):
 
         x=self.preprocess(images)
 
-        of1,of2=self.base_model(x,training=training)
+        of1, of2, of3, of4 = self.base_model(x, training=False)
 
-        of3,of4=self.extra(of2, training=training)
+        of5, of6 = self.extra(of4, training=False)
 
-        fms=[of1,of2,of3,of4]
+        fms = [of1, of2, of3, of4, of5, of6]
+
+        # for i in range(len(fms)):
+        #     print(fms[i].shape)
 
         if cfg.MODEL.dual_mode:
             o_reg, o_cls=self.ssd_head_origin(fms,training=training)
@@ -324,11 +370,13 @@ class DSFD(tf.keras.Model):
 
         x = self.preprocess(images)
 
-        of1,of2=self.base_model(x,training=False)
+        of1,of2,of3,of4=self.base_model(x,training=False)
 
-        of3,of4=self.extra(of2, training=False)
+        of5,of6=self.extra(of4, training=False)
 
-        fms=[of1,of2,of3,of4]
+        fms=[of1,of2,of3,of4,of5,of6]
+        # for i in range(len(fms)):
+        #     print(fms[i].shape)
 
         if cfg.MODEL.fpn:
             fpn_fms = self.fpn(fms, training = False)
@@ -417,12 +465,12 @@ if __name__=='__main__':
     import time
     model=DSFD()
 
-    image = np.zeros(shape=(1, 256, 320, 3), dtype=np.float32)
+    image = np.zeros(shape=(1, 320, 320, 3), dtype=np.float32)
 
-    model.inference(image,0.5,0.45)
+    model.inference(image)
 
     #tf.saved_model.save(model, './model/xx')
     start = time.time()
     for i in range(100):
-        model.inference(image,0.5,0.45)
+        model.inference(image)
     print('xxxyyy', (time.time() - start) / 100.)

@@ -8,7 +8,7 @@ import numpy as np
 import tensorflow as tf
 
 import time
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 from lib.core.api.face_detector import FaceDetector
 
 ap = argparse.ArgumentParser()

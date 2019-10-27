@@ -17,7 +17,7 @@ config.TRAIN.log_interval = 100
 config.TRAIN.epoch = 250
 
 config.TRAIN.lr_value_every_epoch = [0.00001,0.0001,0.001,0.0001,0.00001,0.000001]          ####lr policy
-config.TRAIN.lr_decay_every_epoch = [1,2,120,160,200]
+config.TRAIN.lr_decay_every_epoch = [1,2,100,150,200]
 
 config.TRAIN.weight_decay_factor = 5.e-4                  ##l2 regular
 config.TRAIN.vis=False                                    ##check data flag
@@ -55,8 +55,8 @@ config.ANCHOR = edict()
 config.ANCHOR.rect=True
 config.ANCHOR.rect_longer=True       ####    make anchor h/w=1.5
 config.ANCHOR.ANCHOR_STRIDE = 16
-config.ANCHOR.ANCHOR_SIZES = (32, 96, 256, 512)   # sqrtarea of the anchor box
-config.ANCHOR.ANCHOR_STRIDES = (16, 32, 64, 128)    # strides for each FPN level. Must be the same length as ANCHOR_SIZES
+config.ANCHOR.ANCHOR_SIZES = (16,32,64, 128, 256, 512)   # sqrtarea of the anchor box
+config.ANCHOR.ANCHOR_STRIDES = (4, 8,16, 32, 64, 128)    # strides for each FPN level. Must be the same length as ANCHOR_SIZES
 config.ANCHOR.ANCHOR_RATIOS = (1., 3.) ######           1:1.7 in size,
 config.ANCHOR.POSITIVE_ANCHOR_THRESH = 0.35
 config.ANCHOR.NEGATIVE_ANCHOR_THRESH = 0.35
@@ -67,12 +67,12 @@ config.MODEL = edict()
 config.MODEL.net_structure='Lightnet_0.5'
 config.MODEL.model_path = './model/'  # save directory
 config.MODEL.pretrained_model=None
-config.MODEL.fpn_dims=[96,96,128,256]
-config.MODEL.cpm_dims=[128,160,192,256]
+config.MODEL.fpn_dims=[48,48,96,96,192,192]
+config.MODEL.cpm_dims=[96,96,128,128,256,256]
 
 config.MODEL.fpn=True      ###it's a low level fpn
 config.MODEL.cpm=True
-config.MODEL.dual_mode=False
-config.MODEL.maxout=False
+config.MODEL.dual_mode=True
+config.MODEL.maxout=True
 config.MODEL.max_negatives_per_positive= 3.0
 

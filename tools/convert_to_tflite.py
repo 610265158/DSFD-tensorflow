@@ -5,12 +5,13 @@ import numpy as np
 import time
 
 from tools.tf_model_wraper import DSFDLite
-
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 input_shape=(320,320,3)
 
-saved_model_dir='./model/xx'
+saved_model_dir='./xx'
 saved_model_dir_for_lite=saved_model_dir+'lite_pre'
 
 ### we build the tflite version detect firstly, then save it
@@ -22,7 +23,7 @@ tf.saved_model.save(model,saved_model_dir_for_lite)
 print('the model rebuild over, ')
 
 ####
-save_tf_model="./model/converted_model.tflite"
+save_tf_model="converted_model.tflite"
 
 model=tf.saved_model.load(saved_model_dir_for_lite)
 

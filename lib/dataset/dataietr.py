@@ -54,7 +54,7 @@ class data_info():
 
 class MutiScaleBatcher(BatchData):
 
-    def __init__(self, ds, batch_size, remainder=False, use_list=False,scale_range=None,input_size=(512,512),divide_size=32):
+    def __init__(self, ds, batch_size, remainder=False, use_list=False,scale_range=None,input_size=(512,512),divide_size=64):
         """
         Args:
             ds (DataFlow): A dataflow that produces either list or dict.

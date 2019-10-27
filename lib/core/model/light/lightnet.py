@@ -181,16 +181,16 @@ class Lightnet(tf.keras.Model):
                 batch_norm(),
                 tf.keras.layers.ReLU(),
 
-                tf.keras.layers.MaxPooling2D(pool_size=(3, 3),
-                                          strides=2)
-                # tf.keras.layers.SeparableConv2D(32,
-                #                                kernel_size=(3, 3),
-                #                                strides=2,
-                #                                padding='same',
-                #                                use_bias=False,
-                #                                kernel_initializer=kernel_initializer),
-                # batch_norm(),
-                # tf.keras.layers.ReLU()
+                # tf.keras.layers.MaxPooling2D(pool_size=(3, 3),
+                #                           strides=2)
+                tf.keras.layers.SeparableConv2D(32,
+                                               kernel_size=(3, 3),
+                                               strides=2,
+                                               padding='same',
+                                               use_bias=False,
+                                               kernel_initializer=kernel_initializer),
+                batch_norm(),
+                tf.keras.layers.ReLU()
             ]
             )
 
@@ -201,7 +201,7 @@ class Lightnet(tf.keras.Model):
         self.block2 = LightnetBlock(self.initial_depth * 2,
                                      repeat=4,
                                      kernel_initializer=kernel_initializer)
-        self.block3 = LightnetBlock(self.initial_depth * 2 ,
+        self.block3 = LightnetBlock(self.initial_depth * 2,
                                      repeat=2,
                                      kernel_initializer=kernel_initializer)
 
@@ -217,8 +217,7 @@ class Lightnet(tf.keras.Model):
 
         x3=self.block3(x2, training=training)
 
-
-        return x2,x3
+        return x,x1,x2,x3
 
 
 
