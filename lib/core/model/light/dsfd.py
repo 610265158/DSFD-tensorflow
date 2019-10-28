@@ -5,8 +5,9 @@ sys.path.append('.')
 import tensorflow as tf
 import numpy as np
 
+
+
 from lib.core.anchor.box_utils import batch_decode
-from lib.core.anchor.nms import batch_non_max_suppression
 from lib.core.anchor.tf_anchors import get_all_anchors_fpn
 
 from lib.core.model.light.lightnet import Lightnet
@@ -22,7 +23,7 @@ def batch_norm():
     return tf.keras.layers.BatchNormalization(fused=True,momentum=0.997,epsilon=1e-5)
 
 class CPM(tf.keras.Model):
-    def __init__(self,kernel_initializer='glorot_normal',dim=256):
+    def __init__(self,kernel_initializer='glorot_normal',dim=256, endhance=True):
         super(CPM, self).__init__()
 
 
@@ -37,6 +38,7 @@ class CPM(tf.keras.Model):
 
         self.conv2 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
                                                                           kernel_size=(3,3),
+                                                                          dilation_rate=2,
                                                                           padding='same',
                                                                           kernel_initializer=kernel_initializer,
                                                                           use_bias=False),
@@ -45,6 +47,7 @@ class CPM(tf.keras.Model):
 
         self.conv3 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
                                                                           kernel_size=(3,3),
+                                                                          dilation_rate=2,
                                                                           padding='same',
                                                                           kernel_initializer=kernel_initializer,
                                                                           use_bias=False),
