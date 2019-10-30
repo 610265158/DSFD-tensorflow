@@ -19,7 +19,7 @@ class FaceDetector:
     def __call__(self, image,
                  score_threshold=0.5,
                  iou_threshold=cfg.TEST.iou_thres,
-                 input_shape=(240,320)):
+                 input_shape=(512,512)):
         """Detect faces.
 
         Arguments:

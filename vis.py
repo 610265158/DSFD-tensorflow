@@ -40,7 +40,7 @@ def image_demo(data_dir):
 
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         star=time.time()
-        boxes=detector(img,0.3)
+        boxes=detector(img,0.9)
         #print('one iamge cost %f s'%(time.time()-star))
         #print(boxes.shape)
         #print(boxes)
@@ -84,7 +84,7 @@ def video_demo(cam_id):
 
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        boxes = detector(img, 0.5)
+        boxes = detector(img, 0.9)
 
         for box_index in range(boxes.shape[0]):
             bbox = boxes[box_index]

@@ -320,9 +320,9 @@ class DSFD(tf.keras.Model):
 
         x=self.preprocess(images)
 
-        of1, of2 = self.base_model(x, training=False)
+        of1, of2 = self.base_model(x, training=training)
 
-        of3, of4 = self.extra(of2, training=False)
+        of3, of4 = self.extra(of2, training=training)
 
         fms = [of1, of2, of3, of4]
 
@@ -336,7 +336,7 @@ class DSFD(tf.keras.Model):
             o_cls=None
 
         if cfg.MODEL.fpn:
-            fpn_fms = self.fpn(fms, training=False)
+            fpn_fms = self.fpn(fms, training=training)
         else:
             fpn_fms = fms
 
@@ -360,8 +360,6 @@ class DSFD(tf.keras.Model):
         of3,of4=self.extra(of2, training=False)
 
         fms=[of1,of2,of3,of4]
-        # for i in range(len(fms)):
-        #     print(fms[i].shape)
 
         if cfg.MODEL.fpn:
             fpn_fms = self.fpn(fms, training = False)
