@@ -38,11 +38,11 @@ class DSFDLite(DSFD):
 
         x = self.preprocess(images)
 
-        of1, of2,of3, of4  = self.base_model(x, training=False)
+        of1, of2  = self.base_model(x, training=False)
 
-        of5, of6 = self.extra(of4, training=False)
+        of3, of4 = self.extra(of2, training=False)
 
-        fms = [ of1, of2, of3, of4, of5, of6]
+        fms = [ of1, of2, of3, of4]
 
 
 
