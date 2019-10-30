@@ -44,7 +44,7 @@ config.DATA.PIXEL_STD = [127., 127., 127.]
 config.DATA.hin = 512  # input size
 config.DATA.win = 512
 config.DATA.max_size=[config.DATA.hin,config.DATA.win]  ##h,w
-config.DATA.cover_small_face=10                          ###cover the small faces
+config.DATA.cover_small_face=15                          ###cover the small faces
 
 config.DATA.mutiscale=True                #if muti scale set False  then config.DATA.MAX_SIZE will be the inputsize
 config.DATA.scales=(320,640)
@@ -55,9 +55,9 @@ config.ANCHOR = edict()
 config.ANCHOR.rect=True
 config.ANCHOR.rect_longer=True       ####    make anchor h/w=1.5
 config.ANCHOR.ANCHOR_STRIDE = 16
-config.ANCHOR.ANCHOR_SIZES = (16,32,64, 128, 256, 512)   # sqrtarea of the anchor box
-config.ANCHOR.ANCHOR_STRIDES = (4, 8,16, 32, 64, 128)    # strides for each FPN level. Must be the same length as ANCHOR_SIZES
-config.ANCHOR.ANCHOR_RATIOS = (1., 4.) ######           1:1.7 in size,
+config.ANCHOR.ANCHOR_SIZES = (32,128, 256,512)   # sqrtarea of the anchor box
+config.ANCHOR.ANCHOR_STRIDES = (16, 32, 64,128)    # strides for each FPN level. Must be the same length as ANCHOR_SIZES
+config.ANCHOR.ANCHOR_RATIOS = ( 0.5, 1., 3.) ######           1:2 in size,
 config.ANCHOR.POSITIVE_ANCHOR_THRESH = 0.35
 config.ANCHOR.NEGATIVE_ANCHOR_THRESH = 0.35
 config.ANCHOR.AVG_MATCHES=20
@@ -67,12 +67,12 @@ config.MODEL = edict()
 config.MODEL.net_structure='Lightnet_0.5'
 config.MODEL.model_path = './model/'  # save directory
 config.MODEL.pretrained_model=None
-config.MODEL.fpn_dims=[48,48,96,96,192,192]
-config.MODEL.cpm_dims=[96,96,128,128,256,256]
+config.MODEL.fpn_dims=[96,96,192,192]
+config.MODEL.cpm_dims=[128,128,256,256]
 
 config.MODEL.fpn=True      ###it's a low level fpn
 config.MODEL.cpm=True
-config.MODEL.dual_mode=True
-config.MODEL.maxout=True
+config.MODEL.dual_mode=False
+config.MODEL.maxout=False
 config.MODEL.max_negatives_per_positive= 3.0
 
