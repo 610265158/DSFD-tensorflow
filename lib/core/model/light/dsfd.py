@@ -175,7 +175,7 @@ class Extra(tf.keras.Model):
     def __init__(self,kernel_initializer='glorot_normal'):
         super(Extra, self).__init__()
 
-        self.extra_conv1=tf.keras.Sequential([tf.keras.layers.Conv2D(filters=96,
+        self.extra_conv1=tf.keras.Sequential([tf.keras.layers.Conv2D(filters=128,
                                                                      kernel_size=(1, 1),
                                                                      padding='same',
                                                                      kernel_initializer=kernel_initializer,
@@ -193,7 +193,7 @@ class Extra(tf.keras.Model):
                                                 tf.keras.layers.ReLU()
                                                 ])
 
-        self.extra_conv2 = tf.keras.Sequential([tf.keras.layers.Conv2D(filters=96,
+        self.extra_conv2 = tf.keras.Sequential([tf.keras.layers.Conv2D(filters=128,
                                                                        kernel_size=(1, 1),
                                                                        padding='same',
                                                                        kernel_initializer=kernel_initializer,
@@ -434,11 +434,7 @@ class DSFD(tf.keras.Model):
 
             res = tf.concat([boxes, scores], axis=2)
 
-
         return res
-
-
-
 
 if __name__=='__main__':
 

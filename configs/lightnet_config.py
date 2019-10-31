@@ -44,7 +44,7 @@ config.DATA.PIXEL_STD = [127., 127., 127.]
 config.DATA.hin = 512  # input size
 config.DATA.win = 512
 config.DATA.max_size=[config.DATA.hin,config.DATA.win]  ##h,w
-config.DATA.cover_small_face=15                          ###cover the small faces
+config.DATA.cover_small_face=10                          ###cover the small faces
 
 config.DATA.mutiscale=True                #if muti scale set False  then config.DATA.MAX_SIZE will be the inputsize
 config.DATA.scales=(320,640)
@@ -64,11 +64,11 @@ config.ANCHOR.AVG_MATCHES=20
 config.ANCHOR.super_match=True
 
 config.MODEL = edict()
-config.MODEL.net_structure='Lightnet_0.5'
+config.MODEL.net_structure='Lightnet_0.75'
 config.MODEL.model_path = './model/'  # save directory
 config.MODEL.pretrained_model=None
-config.MODEL.fpn_dims=[96,96,192,192]
-config.MODEL.cpm_dims=[128,128,256,256]
+config.MODEL.fpn_dims=[128,128,192,192]
+config.MODEL.cpm_dims=[128,128,192,192]
 
 config.MODEL.fpn=True      ###it's a low level fpn
 config.MODEL.cpm=True

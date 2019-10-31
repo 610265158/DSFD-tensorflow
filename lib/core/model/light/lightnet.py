@@ -164,7 +164,7 @@ class Lightnet(tf.keras.Model):
                  kernel_initializer='glorot_normal'):
         super(Lightnet, self).__init__()
 
-        possibilities = {'0.5': 48, '0.75': 96, '1.0': 116, '1.5': 176, '2.0': 224}
+        possibilities = {'0.5': 48, '0.75': 64, '1.0': 116, '1.5': 176, '2.0': 224}
         self.initial_depth = possibilities[model_size]
 
 
@@ -181,16 +181,16 @@ class Lightnet(tf.keras.Model):
                 batch_norm(),
                 tf.keras.layers.ReLU(),
 
-                # tf.keras.layers.MaxPooling2D(pool_size=(3, 3),
-                #                           strides=2)
-                tf.keras.layers.SeparableConv2D(32,
-                                               kernel_size=(3, 3),
-                                               strides=2,
-                                               padding='same',
-                                               use_bias=False,
-                                               kernel_initializer=kernel_initializer),
-                batch_norm(),
-                tf.keras.layers.ReLU()
+                tf.keras.layers.MaxPooling2D(pool_size=(3, 3),
+                                          strides=2)
+                # tf.keras.layers.SeparableConv2D(32,
+                #                                kernel_size=(3, 3),
+                #                                strides=2,
+                #                                padding='same',
+                #                                use_bias=False,
+                #                                kernel_initializer=kernel_initializer),
+                # batch_norm(),
+                # tf.keras.layers.ReLU()
             ]
             )
 
