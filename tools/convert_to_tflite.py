@@ -9,7 +9,7 @@ import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
-input_shape=(320,320,3)
+input_shape=(256,320,3)
 
 saved_model_dir='./xx'
 saved_model_dir_for_lite=saved_model_dir+'lite_pre'

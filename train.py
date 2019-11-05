@@ -2,6 +2,8 @@ from lib.helper.logger import logger
 from lib.core.base_trainer.net_work import Train
 from lib.dataset.dataietr import DataIter
 
+
+from lib.core.model.mobilenet.dsfd import DSFD as mb_dsfd
 from lib.core.model.light.dsfd import DSFD as lightnet_dsfd
 from lib.core.model.vgg.dsfd import DSFD as vgg_dsfd
 
@@ -44,6 +46,8 @@ def main():
             model=vgg_dsfd()
         elif 'Lightnet' in cfg.MODEL.net_structure:
             model = lightnet_dsfd()
+        elif 'MobileNetV2_0' in cfg.MODEL.net_structure:
+            model = mb_dsfd()
 
         ###run a time to build the model
         image = np.zeros(shape=(1, 512, 512, 3), dtype=np.float32)

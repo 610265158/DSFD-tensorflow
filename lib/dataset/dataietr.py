@@ -143,22 +143,28 @@ class MutiScaleBatcher(BatchData):
         # copy images to the upper left part of the image batch object
         for [image, boxes_, klass_] in holder:
 
-            # construct an image batch object
-            image, shift_x, shift_y = Fill_img(image, target_width=max_shape[0], target_height=max_shape[1])
-            boxes_[:, 0:4] = boxes_[:, 0:4] + np.array([shift_x, shift_y, shift_x, shift_y], dtype='float32')
-            h, w, _ = image.shape
-            boxes_[:, 0] /= w
-            boxes_[:, 1] /= h
-            boxes_[:, 2] /= w
-            boxes_[:, 3] /= h
-            image = image.astype(np.uint8)
+            try:
+                # construct an image batch object
+                image, shift_x, shift_y = Fill_img(image, target_width=max_shape[0], target_height=max_shape[1])
+                boxes_[:, 0:4] = boxes_[:, 0:4] + np.array([shift_x, shift_y, shift_x, shift_y], dtype='float32')
+                h, w, _ = image.shape
+                boxes_[:, 0] /= w
+                boxes_[:, 1] /= h
+                boxes_[:, 2] /= w
+                boxes_[:, 3] /= h
+                image = image.astype(np.uint8)
 
-            image = cv2.resize(image, (max_shape[0], max_shape[1]))
-            boxes_[:, 0] *= max_shape[0]
-            boxes_[:, 1] *= max_shape[1]
-            boxes_[:, 2] *= max_shape[0]
-            boxes_[:, 3] *= max_shape[1]
-
+                image = cv2.resize(image, (max_shape[0], max_shape[1]))
+                boxes_[:, 0] *= max_shape[0]
+                boxes_[:, 1] *= max_shape[1]
+                boxes_[:, 2] *= max_shape[0]
+                boxes_[:, 3] *= max_shape[1]
+            except:
+                logger.warn('there is an err with but it is was handled')
+                traceback.print_exc()
+                image = np.zeros(shape=(max_shape[0], max_shape[1], 3), dtype=np.float32)
+                boxes_ = np.array([[0, 0, 100, 100]])
+                klass_ = np.array([0])
 
             if cfg.TRAIN.vis:
                 for __box in boxes_:
