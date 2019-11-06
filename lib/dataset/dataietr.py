@@ -162,7 +162,7 @@ class MutiScaleBatcher(BatchData):
             except:
                 logger.warn('there is an err with but it is was handled')
                 traceback.print_exc()
-                image = np.zeros(shape=(max_shape[0], max_shape[1], 3), dtype=np.float32)
+                image = np.zeros(shape=(max_shape[1], max_shape[0], 3), dtype=np.float32)
                 boxes_ = np.array([[0, 0, 100, 100]])
                 klass_ = np.array([0])
 
