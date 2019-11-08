@@ -56,7 +56,7 @@ config.ANCHOR.rect=True
 config.ANCHOR.rect_longer=True       ####    make anchor h/w=1.5
 config.ANCHOR.ANCHOR_STRIDE = 16
 config.ANCHOR.ANCHOR_SIZES = (32,128, 512)   # sqrtarea of the anchor box
-config.ANCHOR.ANCHOR_STRIDES = (16, 32, 64)    # strides for each FPN level. Must be the same length as ANCHOR_SIZES
+config.ANCHOR.ANCHOR_STRIDES = (8, 16, 32)    # strides for each FPN level. Must be the same length as ANCHOR_SIZES
 config.ANCHOR.ANCHOR_RATIOS = (  1., 4.) ######           1:2 in size,
 config.ANCHOR.POSITIVE_ANCHOR_THRESH = 0.35
 config.ANCHOR.NEGATIVE_ANCHOR_THRESH = 0.35

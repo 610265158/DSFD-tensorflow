@@ -284,7 +284,7 @@ class DSFD(tf.keras.Model):
         model_size=cfg.MODEL.net_structure.split('_',1)[-1]
         self.base_model = Lightnet(model_size=model_size,
                                      kernel_initializer=kernel_initializer)
-        self.extra=Extra(kernel_initializer=kernel_initializer)
+        #self.extra=Extra(kernel_initializer=kernel_initializer)
 
 
         if cfg.MODEL.fpn:
@@ -313,9 +313,7 @@ class DSFD(tf.keras.Model):
 
         x=self.preprocess(images)
 
-        of1, of2 = self.base_model(x, training=training)
-
-        of3 = self.extra(of2, training=training)
+        of1, of2, of3 = self.base_model(x, training=training)
 
         fms = [of1, of2, of3]
 
@@ -348,11 +346,9 @@ class DSFD(tf.keras.Model):
 
         x = self.preprocess(images)
 
-        of1,of2=self.base_model(x,training=False)
+        of1, of2, of3=self.base_model(x,training=False)
 
-        of3=self.extra(of2, training=False)
-
-        fms=[of1,of2,of3]
+        fms=[of1, of2, of3]
 
         if cfg.MODEL.fpn:
             fpn_fms = self.fpn(fms, training = False)
