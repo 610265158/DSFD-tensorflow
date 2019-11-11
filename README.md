@@ -15,27 +15,21 @@ Now it is mainly optimised about face detection,and borrows some codes from othe
 
 pretrained model can be download from
 
-+ [baidu disk](https://pan.baidu.com/s/1cUqnf9BwUVkCy0iT6EczKA) ( password ty4d )
-+ [google drive](https://drive.google.com/drive/folders/1zCeXPdRPG6-4W8fqEl4uRD5ojHbDRH-o)
++ [baidu disk](https://pan.baidu.com/s/12uWvuxMSTBro2_U2uPCRdg) ( password 2eai )
++ [google drive](https://drive.google.com/open?id=1wx9SPk03tbzlCSc8H_mivLDYSIW12-nC)
 
 
 
-| model         |input_size| time_cost |   device   |fddb      |
-| :------:      |:------:  |:------:   |   :------: |:------:  |
-| vgg           |free      |None       |    None    | 0.987    |
-| vgg           |512x512   |round 20ms |   2080ti   | 0.987    |
-| Lightnet_0.75 |416x416   |12+ms      |   i7-8700k | 0.961    |
-| Lightnet_0.75 |320x320   |8+ms       |   i7-8700k | 0.950    |
-| Lightnet_0.75 |416x416   |35+ms      |   i5-7200U | 0.961    |
-| Lightnet_0.75 |320x320   |20+ms      |   i5-7200U | 0.950    |
+| model         |input_size| time_cost |   device   |fddb      |model size|
+| :------:      |:------:  |:------:   |   :------: |:------:  |:------:  |
+| Lightnet_0.75 |512x512   |20+ms      |   i7-8700k | 0.953    |900k+-|
+| Lightnet_0.75 |320x320   |10+ms      |   i5-7200U | 0.934    |900k+-|
 
 | model         |input_size| time_cost |   device   |wider easy|wider easy |wider easy |
 | :------:      |:------:  |:------:   |   :------: |:------:  | :------:  | :------:  | 
-| Lightnet_0.75 |mutiscale |None       |   None     | None     |None       |None      |
-| Lightnet_0.75 |1600x1600 |20ms not stable|2080ti  | None     |None       |None      |
-| Lightnet_0.75 |640x640   |5+ms       |   2080ti   | 0.892    |0.828      |0.462      |
+| Lightnet_0.75 |320x320   |5+ms       |   2080ti   | NOne    |NOne      |NOne      |
 
-ps the time cost including nms
+ps the time cost not including nms
 
 ## requirment
 
@@ -96,6 +90,23 @@ example `python model_eval/fddb.py --model model/detector
 example `python model_eval/wider.py --model model/detector 
                                     --data_dir 'WIDER/WIDER_val/' 
                                     --result 'result/' `
+
+
+
+
+### convert tflite and quantization
+Because tflite needs the input shape be fixed,
+we should rebiuld the model first(refer to tools/convert_to_tflite.py),
+set a suitable input shape, and set saved_model_dir='your model' 
+then run 
+`python tools/convert_to_tflite.py`
+
+
+ps, if you want to do quantization when convert to tflite,
+the postprocess should be done by yourself, please take care of it. 
+
+
+
 
 
 ### visualization
