@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from lib.core.model.mobilenet.dsfd import DSFD
+from lib.core.model.light.dsfd import DSFD
 from train_config import config as cfg
 from lib.core.anchor.tf_anchors import get_all_anchors_fpn
 from lib.core.anchor.box_utils import batch_decode
@@ -38,11 +38,11 @@ class DSFDLite(DSFD):
 
         x = self.preprocess(images)
 
-        of1, of2  = self.base_model(x, training=False)
+        of1, of2,of3  = self.base_model(x, training=False)
 
-        of3, of4 = self.extra(of2, training=False)
 
-        fms = [ of1, of2, of3, of4]
+
+        fms = [ of1, of2, of3]
 
 
 
