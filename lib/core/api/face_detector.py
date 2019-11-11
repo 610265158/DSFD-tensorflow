@@ -19,7 +19,7 @@ class FaceDetector:
     def __call__(self, image,
                  score_threshold=0.5,
                  iou_threshold=cfg.TEST.iou_thres,
-                 input_shape=(512,512)):
+                 input_shape=(640,640)):
         """Detect faces.
 
         Arguments:
@@ -90,7 +90,7 @@ class FaceDetector:
 
         return bimage, scale, scale, dx, dy
 
-    def py_nms(self,bboxes, iou_thres, score_thres):
+    def py_nms(self,bboxes, iou_thres, score_thres,max_boxes=1000):
 
         upper_thres = np.where(bboxes[:, 4] > score_thres)[0]
 

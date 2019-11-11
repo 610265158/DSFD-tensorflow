@@ -5,29 +5,31 @@
 
 A tensorflow2 implement dsfd, and there is something different with the origin paper.
 
-It‘s a ssd-like object detect framework, but slightly different,
-combines lots of tricks for face detection, such as dual-shot, dense anchor match, FPN,FEM and so on.
-
 Now it is mainly optimised about face detection,and borrows some codes from other repos.
 
 ** contact me if u have question 2120140200@mail.nankai.edu.cn **
 
 
-pretrained model can be download from
+
+
+
+A light pretrained model can be download from,
+if you want the vgg_dsfd, please retrain or switch to master
 
 + [baidu disk](https://pan.baidu.com/s/12uWvuxMSTBro2_U2uPCRdg) ( password 2eai )
 + [google drive](https://drive.google.com/open?id=1wx9SPk03tbzlCSc8H_mivLDYSIW12-nC)
 
 
 
+## performance
 | model         |input_size| time_cost |   device   |fddb      |model size|
 | :------:      |:------:  |:------:   |   :------: |:------:  |:------:  |
 | Lightnet_0.75 |512x512   |20+ms      |   i7-8700k | 0.953    |900k+-|
 | Lightnet_0.75 |320x320   |10+ms      |   i5-7200U | 0.934    |900k+-|
 
-| model         |input_size| time_cost |   device   |wider easy|wider easy |wider easy |
-| :------:      |:------:  |:------:   |   :------: |:------:  | :------:  | :------:  | 
-| Lightnet_0.75 |320x320   |5+ms       |   2080ti   | NOne    |NOne      |NOne      |
+| model         |input_size  |wider easy|wider easy |wider easy |
+| :------:      |:------:     |:------:  | :------:  | :------:  | 
+| Lightnet_0.75 |640x640  | 0.863    |0.800     |0.431      |
 
 ps the time cost not including nms
 
@@ -51,7 +53,7 @@ and release the WIDER_train, WIDER_val and wider_face_split into ./WIDER, then r
 `...../9_Press_Conference_Press_Conference_9_659.jpg| 483(xmin),195(ymin),735(xmax),543(ymax),1(class) ......` 
 one line for one pic, **caution! class should start from 1, 0 means bg**)
 
-2. set config=vgg_config in train_config.py   or check the train_config.py choose one
+2. set config=lightnet_config in train_config.py   or check the train_config.py choose one
 
 3. if recover from a pretrained model  set config.MODEL.pretrained_model='yourmodel' in the configs
 
