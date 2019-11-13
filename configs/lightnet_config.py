@@ -26,7 +26,7 @@ config.TRAIN.mix_precision=True
 
 config.TEST = edict()
 config.TEST.score_thres = 0.1
-config.TEST.iou_thres = 0.5
+config.TEST.iou_thres = 0.35
 
 
 

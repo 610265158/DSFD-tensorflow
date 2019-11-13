@@ -17,21 +17,23 @@ A light pretrained model can be download from,
 if you want the vgg_dsfd, please retrain or switch to master
 
 + [baidu disk](https://pan.baidu.com/s/12uWvuxMSTBro2_U2uPCRdg) ( password 2eai )
-+ [google drive](https://drive.google.com/open?id=1wx9SPk03tbzlCSc8H_mivLDYSIW12-nC)
++ [google drive](https://drive.google.com/open?id=1tPth2oqDUvfA66q3DruTAXXLoJid8aag)
 
 
 
 ## performance
 | model         |input_size| time_cost |   device   |fddb      |model size|
 | :------:      |:------:  |:------:   |   :------: |:------:  |:------:  |
-| Lightnet_0.75 |512x512   |20+ms      |   i7-8700k | 0.953    |900k+-|
-| Lightnet_0.75 |320x320   |10+ms      |   i5-7200U | 0.934    |900k+-|
+| Lightnet_0.75 |640x640   |5+ms       |   1080     | 0.960    |800k+-|
+| Lightnet_0.75 |320x320   |4+ms       |   1080     | 0.937    |800k+-|
 
 | model         |input_size  |wider easy|wider easy |wider easy |
 | :------:      |:------:     |:------:  | :------:  | :------:  | 
-| Lightnet_0.75 |640x640  | 0.863    |0.800     |0.431      |
+| Lightnet_0.75 |640x640      | 0.867    |0.806     |0.440      |
+| Lightnet_0.75 |1600x1600    | 0.832    |0.819     |0.706      |
+| Lightnet_0.75 |multiscales  | 0.867    |0.847     |0.742      |
 
-ps the time cost not including nms
+ps the time cost not including nms, and flip test is used
 
 ## requirment
 
@@ -79,19 +81,23 @@ one line for one pic, **caution! class should start from 1, 0 means bg**)
 example `python model_eval/fddb.py --model model/detector 
                                     --data_dir 'fddb/img/' 
                                     --split_dir fddb/FDDB-folds/ 
-                                    --result 'result/' `
+                                    --result 'result/'
+                                    --input_shape 640`
                                     
 ** widerface **
 ```
     python model_eval/wider.py [--model [TRAINED_MODEL]] [--data_dir [DATA_DIR]]
-                           [--result [RESULT_DIR]] [--multiscale [use mutiscale test]]
+                           [--result [RESULT_DIR]] [--multiscale [test in multiscales  0-False 1-True]]
+                           [--input_shape [input shape]]
     --model              Path of the saved model,default ./model/detector
     --data_dir           Path of WIDER
     --result             Path to save WIDERface results
  ```
 example `python model_eval/wider.py --model model/detector 
                                     --data_dir 'WIDER/WIDER_val/' 
-                                    --result 'result/' `
+                                    --result 'result/'
+                                    --multiscale 0
+                                    --input_shape 640`
 
 
 
@@ -117,8 +123,9 @@ the postprocess should be done by yourself, please take care of it.
 (caution: i dont know where the demo picture comes from, if u think it's a tort, i would like to delete it.)
 
 
-`python vis.py --model ./model/detector --img_dir ./FDDB`
+`python vis.py --model ./model/detector --img_dir ./FDDB` or
 
+`python vis.py --model ./model/detector.tflite --img_dir ./FDDB`
 u can check th code in vis.py to make it runable, it's simple.
 
 

@@ -12,8 +12,18 @@ class FaceDetector:
             model_path: a string, path to the model params file.
         """
 
-        self.model = tf.saved_model.load(model_path)
 
+
+        if 'lite' in model_path:
+            self.model = tf.lite.Interpreter(model_path=model_path)
+            self.model.allocate_tensors()
+            self.input_details = self.model.get_input_details()
+            self.output_details = self.model.get_output_details()
+            self.tflite=True
+        else:
+            self.model = tf.saved_model.load(model_path)
+
+            self.tflite = False
 
 
     def __call__(self, image,
@@ -32,23 +42,39 @@ class FaceDetector:
             boxes: a float numpy array of shape [num_faces, 5].
 
         """
+        if not self.tflite:
+            if input_shape is None:
+                h,w,c=image.shape
+                input_shape = (math.ceil(h / 64 ) * 64, math.ceil(w / 64 ) * 64)
+            else:
+                h, w = input_shape
+                input_shape = (math.ceil(h / 64 ) * 64, math.ceil(w / 64 ) * 64)
 
-        if input_shape is None:
-            h,w,c=image.shape
-            input_shape = (math.ceil(h / 64 ) * 64, math.ceil(w / 64 ) * 64)
+            image_fornet, scale_x, scale_y,dx,dy = self.preprocess(image,
+                                                             target_height=input_shape[0],
+                                                             target_width =input_shape[1])
+
+            image_fornet = np.expand_dims(image_fornet, 0)
+
+            start = time.time()
+            bboxes = self.model.inference(image_fornet)
+            print('xx', time.time() - start)
         else:
-            h, w = input_shape
-            input_shape = (math.ceil(h / 64 ) * 64, math.ceil(w / 64 ) * 64)
+            input_shape = (320,320)
+            image_fornet, scale_x, scale_y, dx, dy = self.preprocess(image,
+                                                                     target_height=input_shape[0],
+                                                                     target_width=input_shape[1])
 
-        image_fornet, scale_x, scale_y,dx,dy = self.preprocess(image,
-                                                         target_height=input_shape[0],
-                                                         target_width =input_shape[1])
+            image_fornet = np.expand_dims(image_fornet, 0).astype(np.float32)
 
-        image_fornet = np.expand_dims(image_fornet, 0)
+            start = time.time()
+            self.model.set_tensor(self.input_details[0]['index'], image_fornet)
 
-        start = time.time()
-        bboxes = self.model.inference(image_fornet)
-        print('xx', time.time() - start)
+            self.model.invoke()
+
+            bboxes = self.model.get_tensor(self.output_details[0]['index'])
+
+            print('xx', time.time() - start)
 
         bboxes=self.py_nms(np.array(bboxes[0]),iou_thres=iou_threshold,score_thres=score_threshold)
 

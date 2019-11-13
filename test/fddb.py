@@ -13,6 +13,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 ap = argparse.ArgumentParser()
 ap.add_argument( "--model", required=True, default='./model/detector', help="model to eval:")
+ap.add_argument( "--input_shape", required=True, default=640,type=int, help="inputshape to eval:")
 ap.add_argument( "--is_show", required=False, default=False, help="show result or not?")
 ap.add_argument( "--data_dir", required=False, default="./FDDB/img", help="dir to img")
 ap.add_argument( "--split_dir", required=False,default='./FDDB/FDDB-folds',help="dir to FDDB-folds")
@@ -24,7 +25,7 @@ IMAGES_DIR = args.data_dir
 ANNOTATIONS_PATH = args.split_dir
 RESULT_DIR = args.result
 MODEL_PATH = args.model
-
+INPUT_SHAPE=(args.input_shape,args.input_shape)
 face_detector = FaceDetector(MODEL_PATH)
 
 
@@ -91,8 +92,10 @@ def bbox_vote(det):
             dets = np.row_stack((dets, det_accu_sum))
         except:
             dets = det_accu_sum
-
-    dets = dets[0:750, :]
+    try:
+        dets = dets[0:750, :]
+    except:
+        dets = det
     return dets
 
 predictions = []
@@ -102,12 +105,12 @@ for n in tqdm(images_to_use):
     # threshold is important to set low
 
 
-    boxes = face_detector(image_array, score_threshold=0.1)
+    boxes = face_detector(image_array, score_threshold=0.07,input_shape=INPUT_SHAPE)
 
     ##flip det
     flip_img=np.flip(image_array,1)
 
-    boxes_flip_ = face_detector(flip_img, score_threshold=0.1)
+    boxes_flip_ = face_detector(flip_img, score_threshold=0.07,input_shape=INPUT_SHAPE)
     boxes_flip = np.zeros(boxes_flip_.shape)
     boxes_flip[:, 0] = flip_img.shape[1] - boxes_flip_[:, 2]
     boxes_flip[:, 1] = boxes_flip_[:, 1]

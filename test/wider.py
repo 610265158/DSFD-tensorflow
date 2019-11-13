@@ -8,21 +8,29 @@ import numpy as np
 import tensorflow as tf
 
 import time
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 from lib.core.api.face_detector import FaceDetector
+
+
 
 ap = argparse.ArgumentParser()
 ap.add_argument( "--model", required=True, default='./model/detector', help="model to eval:")
 ap.add_argument( "--is_show", required=False, default=False, help="show result or not?")
 ap.add_argument( "--data_dir", required=False, default="./WIDER/WIDER_val", help="dir to img")
-ap.add_argument( "--multiscale", required=False, default=True, help="test in multiscale")
+ap.add_argument( "--multiscale", required=False, default=0,type=int, help="test in multiscales  0-False 1-True")
+
+ap.add_argument( "--input_shape", required=False,type=int, default=640, help="input shape")
 ap.add_argument( "--result", required=False,default='./result',help="dir to write result")
+
 args = ap.parse_args()
 
 
 IMAGES_DIR = args.data_dir
 RESULT_DIR = args.result
 MODEL_PATH = args.model
+INPUT_SHAPE= (args.input_shape,args.input_shape)
+MULTISCALETEST = True if args.multiscale==1 else False
 
 face_detector = FaceDetector(MODEL_PATH)
 def get_data():
@@ -74,8 +82,11 @@ def bbox_vote(det):
             dets = np.row_stack((dets, det_accu_sum))
         except:
             dets = det_accu_sum
+    try:
+        dets = dets[0:750, :]
+    except:
+        dets=det
 
-    dets = dets[0:750, :]
     return dets
 
 def detect_face(img, shrink):
@@ -83,7 +94,11 @@ def detect_face(img, shrink):
         img = cv2.resize(img, None, None, fx=shrink, fy=shrink,
                          interpolation=cv2.INTER_LINEAR)
 
-    detections = face_detector(img, score_threshold=0.05)
+    if not MULTISCALETEST:
+        detections = face_detector(img, score_threshold=0.07,input_shape=(args.input_shape,args.input_shape))
+    else:
+        INPUT_SHAPE=(img.shape[0],img.shape[1])
+        detections = face_detector(img, score_threshold=0.07,input_shape=INPUT_SHAPE)
 
     det_xmin =  detections[:, 0] / shrink
     det_ymin =  detections[:, 1] / shrink
@@ -169,11 +184,11 @@ for index, event in enumerate(event_list):
 
             det0 = detect_face(img, shrink)
 
-            det1 = flip_test( img, shrink)
             ##flip det
-            if args.multiscale:
+            det1 = flip_test( img, shrink)
+
+            if MULTISCALETEST:
                 [det2, det3] = multi_scale_test( img, max_im_shrink)
-                #####
                 det = np.row_stack((det0, det1, det2, det3))
             else:
                 det = np.row_stack((det0, det1))
