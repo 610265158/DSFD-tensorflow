@@ -58,7 +58,7 @@ class basic_unit(tf.keras.Model):
                         tf.keras.layers.ReLU(),
 
                         tf.keras.layers.SeparableConv2D(output_size,
-                                                        kernel_size=(3, 3),
+                                                        kernel_size=(5, 5),
                                                         strides=1,
                                                         padding='same',
                                                         use_bias=False,
@@ -92,7 +92,7 @@ class basic_unit_with_downsampling(tf.keras.Model):
                 tf.keras.layers.ReLU(),
 
                 tf.keras.layers.SeparableConv2D(output_size,
-                                                kernel_size=(5, 5),
+                                                kernel_size=(3, 3),
                                                 strides=2,
                                                 padding='same',
                                                 use_bias=False,
@@ -105,7 +105,7 @@ class basic_unit_with_downsampling(tf.keras.Model):
         self.project_branch = tf.keras.Sequential(
 
             [ tf.keras.layers.SeparableConv2D(output_size,
-                                                kernel_size=(5, 5),
+                                                kernel_size=(3, 3),
                                                 strides=2,
                                                 padding='same',
                                                 use_bias=False,

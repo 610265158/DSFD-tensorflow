@@ -14,19 +14,19 @@ config.TRAIN.prefetch_size = 10                  ### prefect Q size for data pro
 config.TRAIN.num_gpu = 1                         ##match with   os.environ["CUDA_VISIBLE_DEVICES"]
 config.TRAIN.batch_size = 32                     ###A big batch size may achieve a better result, but the memory is a problem
 config.TRAIN.log_interval = 100
-config.TRAIN.epoch = 250
+config.TRAIN.epoch = 300
 
 config.TRAIN.lr_value_every_epoch = [0.00001,0.0001,0.001,0.0001,0.00001,0.000001]          ####lr policy
-config.TRAIN.lr_decay_every_epoch = [1,2,100,150,200]
+config.TRAIN.lr_decay_every_epoch = [1,2,150,200,250]
 
 config.TRAIN.weight_decay_factor = 5.e-4                  ##l2 regular
 config.TRAIN.vis=False                                    ##check data flag
 config.TRAIN.opt='Adam'
-config.TRAIN.mix_precision=False
+config.TRAIN.mix_precision=True
 
 config.TEST = edict()
-config.TEST.score_thres = 0.05
-config.TEST.iou_thres = 0.3
+config.TEST.score_thres = 0.1
+config.TEST.iou_thres = 0.5
 
 
 
@@ -47,7 +47,7 @@ config.DATA.max_size=[config.DATA.hin,config.DATA.win]  ##h,w
 config.DATA.cover_small_face=10                          ###cover the small faces
 
 config.DATA.mutiscale=True                #if muti scale set False  then config.DATA.MAX_SIZE will be the inputsize
-config.DATA.scales=(320,640)
+config.DATA.scales=(320,512)
 
 
 # anchors -------------------------
@@ -57,7 +57,7 @@ config.ANCHOR.rect_longer=True       ####    make anchor h/w=1.5
 config.ANCHOR.ANCHOR_STRIDE = 16
 config.ANCHOR.ANCHOR_SIZES = (32,128, 512)   # sqrtarea of the anchor box
 config.ANCHOR.ANCHOR_STRIDES = (8, 16, 32)    # strides for each FPN level. Must be the same length as ANCHOR_SIZES
-config.ANCHOR.ANCHOR_RATIOS = (  1., 4.) ######           1:2 in size,
+config.ANCHOR.ANCHOR_RATIOS = (1., 4.) ######           1:2 in size,
 config.ANCHOR.POSITIVE_ANCHOR_THRESH = 0.35
 config.ANCHOR.NEGATIVE_ANCHOR_THRESH = 0.35
 config.ANCHOR.AVG_MATCHES=20
@@ -67,8 +67,8 @@ config.MODEL = edict()
 config.MODEL.net_structure='Lightnet_0.75'
 config.MODEL.model_path = './model/'  # save directory
 config.MODEL.pretrained_model=None
-config.MODEL.fpn_dims=[128,128,192]
-config.MODEL.cpm_dims=[128,128,192]
+config.MODEL.fpn_dims=[128,128,128]
+config.MODEL.cpm_dims=[128,128,128]
 
 config.MODEL.fpn=True      ###it's a low level fpn
 config.MODEL.cpm=True

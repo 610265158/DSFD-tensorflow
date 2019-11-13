@@ -27,18 +27,18 @@ class CPM(tf.keras.Model):
         super(CPM, self).__init__()
 
 
-        self.conv1=tf.keras.Sequential([tf.keras.layers.Conv2D(filters=dim//2,
-                                                               kernel_size=(1,1),
-                                                               padding='same',
-                                                               kernel_initializer=kernel_initializer,
-                                                               use_bias=False),
-                                           batch_norm()])
+        # self.conv1=tf.keras.Sequential([tf.keras.layers.Conv2D(filters=dim//2,
+        #                                                        kernel_size=(1,1),
+        #                                                        padding='same',
+        #                                                        kernel_initializer=kernel_initializer,
+        #                                                        use_bias=False),
+        #                                    batch_norm()])
 
 
 
         self.conv2 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
                                                                           kernel_size=(3,3),
-                                                                          dilation_rate=2,
+                                                                          dilation_rate=3,
                                                                           padding='same',
                                                                           kernel_initializer=kernel_initializer,
                                                                           use_bias=False),
@@ -47,7 +47,7 @@ class CPM(tf.keras.Model):
 
         self.conv3 = tf.keras.Sequential([tf.keras.layers.SeparableConv2D(filters=dim//4,
                                                                           kernel_size=(3,3),
-                                                                          dilation_rate=2,
+                                                                          dilation_rate=3,
                                                                           padding='same',
                                                                           kernel_initializer=kernel_initializer,
                                                                           use_bias=False),
@@ -56,13 +56,13 @@ class CPM(tf.keras.Model):
 
     def call(self, x,training):
 
-        cpm1=self.conv1(x,training=training)
+        #cpm1=self.conv1(x,training=training)
 
         cpm2=self.conv2(x,training=training)
 
         cpm3 =self.conv3(cpm2,training=training)
 
-        return tf.nn.relu(tf.concat([cpm1,cpm2,cpm3],axis=3))
+        return tf.nn.relu(tf.concat([x,cpm2,cpm3],axis=3))
 
 class Fpn(tf.keras.Model):
     def __init__(self,kernel_initializer='glorot_normal'):
@@ -98,17 +98,17 @@ class Fpn(tf.keras.Model):
 
         of1,of2,of3=fms
 
-        upsample = self.conv_2_0(of3)
+        of3_upsample = self.conv_2_0(of3)
 
         lateral = self.conv_2_1(of2)
-        fpn2 = self.upsample_add(upsample, lateral)
+        fpn2 = self.upsample_product(of3_upsample, lateral)
 
         upsample = self.conv_1_0(fpn2)
 
         lateral = self.conv_1_1(of1)
-        fpn1 = self.upsample_add(upsample, lateral)
+        fpn1 = self.upsample_product(upsample, lateral)
 
-        return [fpn1,fpn2,of3]
+        return [fpn1,fpn2,of3_upsample]
 
 
 
@@ -284,7 +284,7 @@ class DSFD(tf.keras.Model):
         model_size=cfg.MODEL.net_structure.split('_',1)[-1]
         self.base_model = Lightnet(model_size=model_size,
                                      kernel_initializer=kernel_initializer)
-        #self.extra=Extra(kernel_initializer=kernel_initializer)
+
 
 
         if cfg.MODEL.fpn:
@@ -372,7 +372,6 @@ class DSFD(tf.keras.Model):
         w = tf.shape(images)[2]
         anchors_ = get_all_anchors_fpn(max_size=[h, w])
 
-
         if cfg.MODEL.dual_mode:
             anchors_ = anchors_[0::2]
         else:
@@ -391,8 +390,8 @@ class DSFD(tf.keras.Model):
         std = np.asarray(cfg.DATA.PIXEL_STD)
 
         image_mean = tf.constant(mean, dtype=tf.float32)
-        image_invstd = tf.constant(1.0 / std, dtype=tf.float32)
-        image = (image - image_mean)  *image_invstd
+        image_invstd = tf.constant(std, dtype=tf.float32)
+        image = (image - image_mean) /image_invstd
 
         return image
     def postprocess(self,box_encodings,cla,anchors):
@@ -437,7 +436,7 @@ if __name__=='__main__':
 
     model.inference(image)
 
-    #tf.saved_model.save(model, './model/xx')
+    tf.saved_model.save(model, './model/xx')
     start = time.time()
     for i in range(100):
         model.inference(image)

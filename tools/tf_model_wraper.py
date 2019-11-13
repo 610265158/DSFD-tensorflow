@@ -38,7 +38,7 @@ class DSFDLite(DSFD):
 
         x = self.preprocess(images)
 
-        of1, of2, of3  = self.base_model(x, training=False)
+        of1, of2, of3 = self.base_model(x, training=False)
 
 
 
