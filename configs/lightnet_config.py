@@ -75,4 +75,4 @@ config.MODEL.cpm=True
 config.MODEL.dual_mode=False
 config.MODEL.maxout=False
 config.MODEL.max_negatives_per_positive= 3.0
-
+config.MODEL.focal_loss=True

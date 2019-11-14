@@ -230,15 +230,16 @@ class SSDHead(tf.keras.Model):
                                                 kernel_initializer=kernel_initializer
                                                 ) for i in range(fm_levels)]
 
-        if cfg.MODEL.maxout:
-            self.conv_cls = [MaxOut(ratio_per_pixel=self.num_predict_per_level)]
+        if cfg.MODEL.focal_loss:
+            self.conv_cls = [
+                tf.keras.layers.Conv2D(filters=self.num_predict_per_level * (cfg.DATA.num_class-1),
+                                       kernel_size=(1, 1),
+                                       padding='same',
+                                       kernel_initializer=kernel_initializer
+                                       ) for i in range(fm_levels)]
 
-            self.conv_cls += [tf.keras.layers.Conv2D(filters=self.num_predict_per_level * cfg.DATA.num_class,
-                                                     kernel_size=(1, 1),
-                                                     padding='same',
-                                                     kernel_initializer=kernel_initializer
-                                                     ) for i in range(fm_levels - 1)]
         else:
+
             self.conv_cls = [
                 tf.keras.layers.Conv2D(filters=self.num_predict_per_level * cfg.DATA.num_class,
                                        kernel_size=(1, 1),
@@ -409,10 +410,12 @@ class DSFD(tf.keras.Model):
             boxes = batch_decode(box_encodings, anchors)
 
             # it has shape [batch_size, num_anchors, 4]
-
-            scores = tf.nn.softmax(cla, axis=2)[:, :, 1:]  ##ignore the bg
+            if cfg.MODEL.focal_loss:
+                scores = tf.nn.sigmoid(cla, axis=2)  ##ignore the bg
+            else:
+                scores = tf.nn.softmax(cla, axis=2)[:, :, 1:]  ##ignore the bg
             # it has shape [batch_size, num_anchors,class]
-            labels = tf.argmax(scores,axis=2)
+            #labels = tf.argmax(scores,axis=2)
             # it has shape [batch_size, num_anchors]
 
             scores = tf.reduce_max(scores,axis=2)
