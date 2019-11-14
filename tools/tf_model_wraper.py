@@ -5,7 +5,7 @@ from train_config import config as cfg
 from lib.core.anchor.tf_anchors import get_all_anchors_fpn
 from lib.core.anchor.box_utils import batch_decode
 
-
+from train_config import config as cfg
 class DSFDLite(DSFD):
     #below are funcs for tflite converter
     def __init__(self,input_shape):
@@ -15,7 +15,6 @@ class DSFDLite(DSFD):
         :param input_shape: h,w,c or h,w
         '''
         self.input_size=input_shape
-
 
         self.pre_define_anchor=self.get_pre_define_anchors(self.input_size[0],self.input_size[1])
 
@@ -32,7 +31,6 @@ class DSFDLite(DSFD):
         pass
 
 
-
     @tf.function(input_signature=[tf.TensorSpec([None, None, None, 3], tf.float32)])
     def inference_fixed(self, images):
 
@@ -40,17 +38,12 @@ class DSFDLite(DSFD):
 
         of1, of2, of3 = self.base_model(x, training=False)
 
-
-
         fms = [ of1, of2, of3]
-
-
 
         if cfg.MODEL.fpn:
             fpn_fms = self.fpn(fms, training = False)
         else:
             fpn_fms=fms
-
 
         if cfg.MODEL.cpm:
             for i in range(len(fpn_fms)):
@@ -65,15 +58,18 @@ class DSFDLite(DSFD):
         boxes = batch_decode(fpn_reg, self.pre_define_anchor)
 
         # it has shape [batch_size, num_anchors, 4]
+        # it has shape [batch_size, num_anchors, 4]
+        if cfg.MODEL.focal_loss:
+            scores = tf.nn.sigmoid(fpn_cls)  ##ignore the bg
+        else:
+            scores = tf.nn.softmax(fpn_cls, axis=2)[:, :, 1:]  ##ignore the bg
+            # it has shape [batch_size, num_anchors,class]
+            labels = tf.argmax(scores, axis=2)
+            # it has shape [batch_size, num_anchors]
 
-        scores = tf.nn.softmax(fpn_cls, axis=2)[:, :, 1:]  ##ignore the bg
-        # it has shape [batch_size, num_anchors,class]
-        labels = tf.argmax(scores, axis=2)
-        # it has shape [batch_size, num_anchors]
-
-        scores = tf.reduce_max(scores, axis=2)
-        scores =tf.expand_dims(scores,axis=-1)
-        # it has shape [batch_size, num_anchors]
+            scores = tf.reduce_max(scores, axis=2)
+            scores =tf.expand_dims(scores,axis=-1)
+            # it has shape [batch_size, num_anchors]
 
         res=tf.concat([boxes,scores],axis=2)
 

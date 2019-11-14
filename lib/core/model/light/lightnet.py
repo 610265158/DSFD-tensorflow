@@ -1,9 +1,5 @@
 import tensorflow as tf
 
-
-
-from tensorflow_core.python.layers.pooling import MaxPooling2D
-
 def batch_norm():
     return tf.keras.layers.BatchNormalization(fused=True,
                                               momentum=0.997,

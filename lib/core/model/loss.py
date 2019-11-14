@@ -35,14 +35,14 @@ def calculate_loss( origin_reg, origin_cls,final_reg, final_cls,boxes,labels):
     return reg_loss+cls_loss
 
 
-def ssd_loss(reg_predict,cla_predict,reg_label,cla_label):
+def ssd_loss(reg_predict,cls_predict,reg_label,cls_label):
 
 
 
-    cla_label = tf.cast(cla_label, tf.int32)
+    cls_label = tf.cast(cls_label, tf.int32)
 
     # whether anchor is matched
-    is_matched = tf.greater(cla_label, 0)
+    is_matched = tf.greater(cls_label, 0)
     weights = tf.cast(is_matched,tf.float32)
 
 
@@ -50,13 +50,13 @@ def ssd_loss(reg_predict,cla_predict,reg_label,cla_label):
 
     if cfg.MODEL.focal_loss:
         cls_losses=focal_loss(
-        cla_predict,
-        cla_label
+        cls_predict,
+        cls_label
         )
     else:
         cls_losses = ohem_loss(
-            cla_predict,
-            cla_label,
+            cls_predict,
+            cls_label,
             weights
         )
 
@@ -105,6 +105,7 @@ def localization_loss(predictions, targets, weights,sigma=9):
     Returns:
         a float tensor with shape [batch_size, num_anchors].
     """
+
     abs_diff = tf.abs(predictions - targets)
     abs_diff_lt_1 = tf.less(abs_diff, 1.0/sigma)
     return weights * tf.reduce_sum(
@@ -185,6 +186,10 @@ def focal_loss(prediction_tensor, target_tensor, weights=None, alpha=0.25, gamma
     Returns:
         loss: A (scalar) tensor representing the value of the loss function
     """
+
+    target_tensor = tf.cast(target_tensor, tf.float32)
+    target_tensor=tf.expand_dims(target_tensor,axis=-1)
+
     sigmoid_p = tf.nn.sigmoid(prediction_tensor)
     zeros = tf.zeros_like(sigmoid_p, dtype=sigmoid_p.dtype)
 

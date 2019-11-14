@@ -386,16 +386,14 @@ class DSFD(tf.keras.Model):
     def preprocess(self,image):
 
 
-        image = tf.cast(image, tf.float32)
-
         mean = cfg.DATA.PIXEL_MEAN
-        std = np.asarray(cfg.DATA.PIXEL_STD)
-
+        std = cfg.DATA.PIXEL_STD
         image_mean = tf.constant(mean, dtype=tf.float32)
         image_invstd = tf.constant(std, dtype=tf.float32)
         image = (image - image_mean) /image_invstd
 
         return image
+
     def postprocess(self,box_encodings,cls,anchors):
         """Postprocess outputs of the network.
 
@@ -417,15 +415,15 @@ class DSFD(tf.keras.Model):
                 scores = tf.nn.softmax(cls, axis=2)[:, :, 1:]  ##ignore the bg
 
 
-            print(scores.shape)
-            # it has shape [batch_size, num_anchors,class]
-            #labels = tf.argmax(scores,axis=2)
-            # it has shape [batch_size, num_anchors]
 
-            #scores = tf.reduce_max(scores,axis=2)
-            # it has shape [batch_size, num_anchors]
-            #scores = tf.expand_dims(scores, axis=-1)
-            # it has shape [batch_size, num_anchors]
+                #it has shape [batch_size, num_anchors,class]
+                labels = tf.argmax(scores,axis=2)
+                #it has shape [batch_size, num_anchors]
+
+                scores = tf.reduce_max(scores,axis=2)
+                #it has shape [batch_size, num_anchors]
+                scores = tf.expand_dims(scores, axis=-1)
+                #it has shape [batch_size, num_anchors]
 
             res = tf.concat([boxes, scores], axis=2)
 
