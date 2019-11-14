@@ -224,31 +224,31 @@ class SSDHead(tf.keras.Model):
         else:
             self.num_predict_per_level = ratio_per_pixel
 
+        if cfg.MODEL.focal_loss:
+            self.num_class = (cfg.DATA.num_class - 1)
+        else:
+            self.num_class = (cfg.DATA.num_class)
+
+
         self.conv_reg = [tf.keras.layers.Conv2D(filters=self.num_predict_per_level * 4,
                                                 kernel_size=(1, 1),
                                                 padding='same',
                                                 kernel_initializer=kernel_initializer
                                                 ) for i in range(fm_levels)]
 
-        if cfg.MODEL.focal_loss:
-            self.conv_cls = [
-                tf.keras.layers.Conv2D(filters=self.num_predict_per_level * (cfg.DATA.num_class-1),
-                                       kernel_size=(1, 1),
-                                       padding='same',
-                                       kernel_initializer=kernel_initializer
-                                       ) for i in range(fm_levels)]
 
-        else:
 
-            self.conv_cls = [
-                tf.keras.layers.Conv2D(filters=self.num_predict_per_level * cfg.DATA.num_class,
-                                       kernel_size=(1, 1),
-                                       padding='same',
-                                       kernel_initializer=kernel_initializer
-                                       ) for i in range(fm_levels)]
+        self.conv_cls = [
+            tf.keras.layers.Conv2D(filters=self.num_predict_per_level * (cfg.DATA.num_class-1),
+                                   kernel_size=(1, 1),
+                                   padding='same',
+                                   kernel_initializer=kernel_initializer
+                                   ) for i in range(fm_levels)]
+
+
 
     def call(self,fms,training):
-        cla_set = []
+        cls_set = []
         reg_set = []
 
 
@@ -260,20 +260,21 @@ class SSDHead(tf.keras.Model):
 
             reg_out = self.conv_reg[i](current_feature)
 
-            cla_out = self.conv_cls[i](current_feature)
+            cls_out = self.conv_cls[i](current_feature)
 
             reg_out = tf.reshape(reg_out, ([-1, dim_h, dim_w, self.num_predict_per_level, 4]))
             reg_out = tf.reshape(reg_out, ([-1, dim_h * dim_w * self.num_predict_per_level, 4]))
 
-            cla_out = tf.reshape(cla_out, ([-1, dim_h, dim_w, self.num_predict_per_level, cfg.DATA.num_class]))
-            cla_out = tf.reshape(cla_out, ([-1, dim_h * dim_w * self.num_predict_per_level, cfg.DATA.num_class]))
 
-            cla_set.append(cla_out)
+            cls_out = tf.reshape(cls_out, ([-1, dim_h, dim_w, self.num_predict_per_level, self.num_class]))
+            cls_out = tf.reshape(cls_out, ([-1, dim_h * dim_w * self.num_predict_per_level, self.num_class]))
+
+            cls_set.append(cls_out)
             reg_set.append(reg_out)
 
         reg = tf.concat(reg_set, axis=1)
-        cla = tf.concat(cla_set, axis=1)
-        return reg, cla
+        cls = tf.concat(cls_set, axis=1)
+        return reg, cls
 
 
 class DSFD(tf.keras.Model):
@@ -395,7 +396,7 @@ class DSFD(tf.keras.Model):
         image = (image - image_mean) /image_invstd
 
         return image
-    def postprocess(self,box_encodings,cla,anchors):
+    def postprocess(self,box_encodings,cls,anchors):
         """Postprocess outputs of the network.
 
         Returns:
@@ -411,16 +412,19 @@ class DSFD(tf.keras.Model):
 
             # it has shape [batch_size, num_anchors, 4]
             if cfg.MODEL.focal_loss:
-                scores = tf.nn.sigmoid(cla, axis=2)  ##ignore the bg
+                scores = tf.nn.sigmoid(cls)  ##ignore the bg
             else:
-                scores = tf.nn.softmax(cla, axis=2)[:, :, 1:]  ##ignore the bg
+                scores = tf.nn.softmax(cls, axis=2)[:, :, 1:]  ##ignore the bg
+
+
+            print(scores.shape)
             # it has shape [batch_size, num_anchors,class]
             #labels = tf.argmax(scores,axis=2)
             # it has shape [batch_size, num_anchors]
 
-            scores = tf.reduce_max(scores,axis=2)
+            #scores = tf.reduce_max(scores,axis=2)
             # it has shape [batch_size, num_anchors]
-            scores = tf.expand_dims(scores, axis=-1)
+            #scores = tf.expand_dims(scores, axis=-1)
             # it has shape [batch_size, num_anchors]
 
             res = tf.concat([boxes, scores], axis=2)
@@ -435,7 +439,7 @@ if __name__=='__main__':
     import time
     model=DSFD()
 
-    image = np.zeros(shape=(1, 256, 320, 3), dtype=np.float32)
+    image = np.zeros(shape=(1, 320, 320, 3), dtype=np.float32)
 
     model.inference(image)
 
