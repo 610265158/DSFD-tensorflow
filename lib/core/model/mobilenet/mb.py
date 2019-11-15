@@ -17,14 +17,14 @@ class MobileNet(tf.keras.Model):
 
         base_model.summary()
 
-        #layers_out = ["block_6_expand_relu", "block_13_expand_relu", "block_16_expand_relu"]
-        layers_out = ["block_13_expand_relu", "block_16_expand_relu"]
+        layers_out = ["block_6_expand_relu", "block_13_expand_relu", "block_16_expand_relu"]
         intermid_outputs = [base_model.get_layer(layer_name).output for layer_name in layers_out]
+
         self.backbone_features = tf.keras.Model(inputs=base_model.input, outputs=intermid_outputs)
 
         self.backbone_features.summary()
 
     def call(self, inputs, training):
-        p1, p2 = self.backbone_features(inputs, training=training)
+        p1, p2,p3 = self.backbone_features(inputs, training=training)
 
-        return p1, p2
+        return p1, p2,p3
