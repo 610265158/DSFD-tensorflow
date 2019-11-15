@@ -9,7 +9,7 @@ import argparse
 
 from lib.core.api.face_detector import FaceDetector
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 ap = argparse.ArgumentParser()
 ap.add_argument( "--model", required=True, default='./model/detector', help="model to eval:")

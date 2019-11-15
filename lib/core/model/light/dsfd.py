@@ -239,7 +239,7 @@ class SSDHead(tf.keras.Model):
 
 
         self.conv_cls = [
-            tf.keras.layers.Conv2D(filters=self.num_predict_per_level * (cfg.DATA.num_class-1),
+            tf.keras.layers.Conv2D(filters=self.num_predict_per_level * (self.num_class),
                                    kernel_size=(1, 1),
                                    padding='same',
                                    kernel_initializer=kernel_initializer
