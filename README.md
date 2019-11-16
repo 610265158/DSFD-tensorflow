@@ -30,9 +30,9 @@ if you want the vgg_dsfd, please retrain or switch to master
 | model         |input_size |fddb      |model size|
 | :------:      |:------:   |:------:  |:------:  |
 | Lightnet_0.75|640x640     | 0.960    |800k+-|
-| Lightnet_0.5 |640x640     | 0.953    |580k+-|
-| Lightnet_0.5 |416x416     | 0.953    |580k+-|
-| Lightnet_0.5 |320x320     | 0.936    |580k+-|
+| Lightnet_0.5 |640x640     | 0.953    |560k+-|
+| Lightnet_0.5 |416x416     | 0.953    |560k+-|
+| Lightnet_0.5 |320x320     | 0.936    |560k+-|
 
 | model         |input_size  |wider easy|wider media |wider hard |
 | :------:      |:------:     |:------:  | :------:  | :------:  | 
