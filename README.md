@@ -16,22 +16,29 @@ Now it is mainly optimised about face detection,and borrows some codes from othe
 A light pretrained model can be download from,
 if you want the vgg_dsfd, please retrain or switch to master
 
-+ [baidu disk](https://pan.baidu.com/s/12uWvuxMSTBro2_U2uPCRdg) ( password 2eai )
-+ [google drive](https://drive.google.com/open?id=1tPth2oqDUvfA66q3DruTAXXLoJid8aag)
+## pretrained model and performance
+
+###### Lightnet_0.5  including tflite model, 
+###### (time cost: mac i5-8279U@2.4GHz， tf2.0 15ms+， tflite 8ms+-,input 320x320)
+
++ [baidu disk](https://pan.baidu.com/s/1ZJZHJz8VFXahmwBptGQfiA) ( password yqst )
++ [google drive](https://drive.google.com/open?id=1ZZVA7QhwGWYJ-09KoU2iym90zqbrfTQH)
 
 
 
-## performance
-| model         |input_size| time_cost |   device   |fddb      |model size|
-| :------:      |:------:  |:------:   |   :------: |:------:  |:------:  |
-| Lightnet_0.75 |640x640   |5+ms       |   1080     | 0.960    |800k+-|
-| Lightnet_0.75 |320x320   |4+ms       |   1080     | 0.937    |800k+-|
 
-| model         |input_size  |wider easy|wider easy |wider easy |
+| model         |input_size |fddb      |model size|
+| :------:      |:------:   |:------:  |:------:  |
+| Lightnet_0.75|640x640     | 0.960    |800k+-|
+| Lightnet_0.5 |640x640     | 0.953    |580k+-|
+| Lightnet_0.5 |416x416     | 0.953    |580k+-|
+| Lightnet_0.5 |320x320     | 0.936    |580k+-|
+
+| model         |input_size  |wider easy|wider media |wider hard |
 | :------:      |:------:     |:------:  | :------:  | :------:  | 
 | Lightnet_0.75 |640x640      | 0.867    |0.806     |0.440      |
-| Lightnet_0.75 |1600x1600    | 0.832    |0.819     |0.706      |
-| Lightnet_0.75 |multiscales  | 0.867    |0.847     |0.742      |
+| Lightnet_0.5  |640x640      | 0.858    |0.796     |0.430      |
+| Lightnet_0.5 |multiscale   | 0.861     |0.837     |0.726      |
 
 ps the time cost not including nms, and flip test is used
 
