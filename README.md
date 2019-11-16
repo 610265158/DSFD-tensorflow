@@ -19,7 +19,7 @@ if you want the vgg_dsfd, please retrain or switch to master
 ## pretrained model and performance
 
 ###### Lightnet_0.5  including tflite model, 
-###### (time cost: mac i5-8279U@2.4GHz， tf2.0 15ms+， tflite 8ms+-,input 320x320)
+###### (time cost: mac i5-8279U@2.4GHz， tf2.0 15ms+， tflite 8ms+-,input shape 320x320)
 
 + [baidu disk](https://pan.baidu.com/s/1ZJZHJz8VFXahmwBptGQfiA) ( password yqst )
 + [google drive](https://drive.google.com/open?id=1ZZVA7QhwGWYJ-09KoU2iym90zqbrfTQH)
