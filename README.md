@@ -34,7 +34,7 @@ if you want the vgg_dsfd, please retrain or switch to master
 | Lightnet_0.5 |416x416     | 0.953    |560k+-|
 | Lightnet_0.5 |320x320     | 0.936    |560k+-|
 
-| model         |input_size  |wider easy|wider media |wider hard |
+| model         |input_size  |wider easy|wider medium |wider hard |
 | :------:      |:------:     |:------:  | :------:  | :------:  | 
 | Lightnet_0.75 |640x640      | 0.867    |0.806     |0.440      |
 | Lightnet_0.5  |640x640      | 0.858    |0.796     |0.430      |
