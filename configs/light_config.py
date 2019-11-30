@@ -25,7 +25,7 @@ config.TRAIN.val_set_size=3000                 ###widerface val size
 config.TRAIN.iter_num_per_epoch = config.TRAIN.train_set_size // config.TRAIN.num_gpu // config.TRAIN.batch_size
 config.TRAIN.val_iter=config.TRAIN.val_set_size// config.TRAIN.num_gpu // config.TRAIN.batch_size
 
-config.TRAIN.lr_value_every_step = [0.00001,0.0001,0.001,0.0001,0.00001,0.000001]        ##warm up is used
+config.TRAIN.lr_value_every_step = [0.001,0.001,0.001,0.0001,0.00001,0.000001]        ##warm up is used
 config.TRAIN.lr_decay_every_step = [500,1000,60000,80000,100000]
 
 config.TRAIN.opt='adam'
@@ -53,8 +53,8 @@ config.DATA.num_class = config.DATA.num_category + 1        # +1 background
 config.DATA.PIXEL_MEAN = [123., 116., 103.]                 ###rgb
 config.DATA.PIXEL_STD = [58., 57., 57.]
 
-config.DATA.hin = 416  # input size
-config.DATA.win = 416
+config.DATA.hin = 320  # input size
+config.DATA.win = 320
 config.DATA.max_size=[config.DATA.hin,config.DATA.win]  ##h,w
 config.DATA.cover_small_face=5                          ###cover the small faces
 

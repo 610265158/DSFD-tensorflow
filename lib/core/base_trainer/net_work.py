@@ -214,7 +214,7 @@ class trainner():
                         with tf.name_scope('tower_%d' % (i)) as scope:
                             with slim.arg_scope([slim.model_variable, slim.variable], device='/cpu:0'):
 
-                                images_ = tf.placeholder(tf.float32, [None, None,None, 3], name="images")
+                                images_ = tf.placeholder(tf.float32, [None, cfg.DATA.hin,cfg.DATA.win, 3], name="images")
                                 boxes_ = tf.placeholder(tf.float32, [cfg.TRAIN.batch_size, None, 4], name="input_boxes")
                                 labels_ = tf.placeholder(tf.int64, [cfg.TRAIN.batch_size, None], name="input_labels")
                                 ###total anchor
@@ -335,6 +335,11 @@ class trainner():
         with self._graph.as_default():
             # Create a saver.
             self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=None)
+
+            tmp_model_name = cfg.MODEL.model_path +'/detector_for_convert.ckpt'
+            logger.info('A tmp model  saved as %s \n' % tmp_model_name)
+            self.saver.save(self.sess, save_path=tmp_model_name)
+
 
             # Build the summary operation from the last tower summaries.
             self.summary_op = tf.summary.merge(self.summaries)

@@ -41,7 +41,7 @@ def facedetect():
 
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         star=time.time()
-        boxes=detector(img,0.4,input_shape=(416,416))
+        boxes=detector(img,0.3,input_shape=(320,320))
 
 
 

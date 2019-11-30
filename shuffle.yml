@@ -1,0 +1,15 @@
+models:
+  shuffle_detector:
+    platform: tensorflow
+    model_file_path: /home/lz/DSFD-tensorflow/model/detector.pb
+    model_sha256_checksum: e213d8d646c41648348f0193eafc609c52572a4d132ec90ddcfca665c64c1258
+    subgraphs:
+      - input_tensors:
+          - tower_0/images:0
+        input_shapes:
+          - 1,320,320,3
+        output_tensors:
+          - tower_0/outputs:0
+        output_shapes:
+          - 1,4200,5
+    runtime: gpu

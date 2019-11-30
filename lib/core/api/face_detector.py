@@ -26,7 +26,7 @@ class FaceDetector:
             ]
 
 
-    def __call__(self, image, score_threshold=0.5,input_shape=(512,512)):
+    def __call__(self, image, score_threshold=0.5,input_shape=(320,320)):
         """Detect faces.
 
         Arguments:

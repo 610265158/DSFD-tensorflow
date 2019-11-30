@@ -18,6 +18,7 @@ from lib.helper.logger import logger
 
 from lib.core.model.net.vgg.ssd_head import SSDHead
 
+from lib.core.anchor.anchor import anchor_tools
 
 class DSFD():
 
@@ -59,11 +60,11 @@ class DSFD():
 
         ###### adjust the anchors to the image shape, but it trains with a fixed h,w
 
-        h = tf.shape(inputs)[1]
-        w = tf.shape(inputs)[2]
-        anchors_ = get_all_anchors_fpn(max_size=[h, w])
-
-
+        anchors_=anchor_tools.anchors
+        anchors_[:, 0] = anchors_[:, 0] / cfg.DATA.win
+        anchors_[:, 1] = anchors_[:, 1] / cfg.DATA.hin
+        anchors_[:, 2] = anchors_[:, 2] / cfg.DATA.win
+        anchors_[:, 3] = anchors_[:, 3] / cfg.DATA.hin
 
         self.postprocess(reg, cls, anchors_)
 
