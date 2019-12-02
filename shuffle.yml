@@ -2,7 +2,7 @@ models:
   shuffle_detector:
     platform: tensorflow
     model_file_path: /home/lz/DSFD-tensorflow/model/detector.pb
-    model_sha256_checksum: e213d8d646c41648348f0193eafc609c52572a4d132ec90ddcfca665c64c1258
+    model_sha256_checksum: c7e184a116e51d8093898ac5c3b36b39a2499fe2233f67f21c6d9536ecc4b427
     subgraphs:
       - input_tensors:
           - tower_0/images:0

@@ -140,23 +140,107 @@ def shufflenet_v2(inputs,is_training=True,depth_multiplier='0.75'):
                 print('first conv shape', net.shape)
                 endpoints['conv1'] = net
 
-                x = block(net, num_units=2, out_channels=initial_depth, scope='Stage2')
-                print('stage2 shape', x.shape)
-                endpoints['stage2'] = x
-                x = block(x, num_units=4, out_channels=initial_depth*2, scope='Stage3')
-                print('stage3 shape', x.shape)
-                endpoints['stage3'] = x
-                block3 = block(x, num_units=2, out_channels=initial_depth*2, scope='Stage4')
-                print('stage4 shape', block3.shape)
-                endpoints['stage4'] = block3
+                block1 = block(net, num_units=2, out_channels=initial_depth, scope='Stage2')
+
+                block2 = block(block1, num_units=4, out_channels=initial_depth*2, scope='Stage3')
+
+                block3 = block(block2, num_units=2, out_channels=initial_depth*2, scope='Stage4')
 
 
-    return block3,endpoints
+        fms=[block1,block2,block3]
+    return fms
+
+def cpm(product,scope,dim):
+    with tf.variable_scope(scope):
+        eyes_1 = slim.conv2d(product, dim // 2, [3, 3], stride=1, rate=1, activation_fn=tf.nn.relu,
+                             scope='eyes_1')
+
+        eyes_2_1 = slim.conv2d(product, dim // 2, [3, 3], stride=1, rate=2, activation_fn=tf.nn.relu,
+                               normalizer_fn=None, scope='eyes_2_1')
+        eyes_2 = slim.conv2d(eyes_2_1, dim // 4, [3, 3], stride=1, rate=1, activation_fn=tf.nn.relu,
+                             scope='eyes_2')
+
+        eyes_3_1 = slim.conv2d(eyes_2_1, dim // 4, [3, 3], stride=1, rate=2, activation_fn=tf.nn.relu,
+                               normalizer_fn=None, scope='eyes_3_1')
+        eyes_3 = slim.conv2d(eyes_3_1, dim // 4, [3, 3], stride=1, rate=1, activation_fn=tf.nn.relu,
+                             scope='eyes_3')
+
+    fme_res = tf.concat([eyes_1, eyes_2, eyes_3], axis=3)
+
+    return fme_res
 
 
 
 
 
+def create_fpn_net(blocks,dims_list):
+
+    of1, of2, of3= blocks
+
+    lateral2 = slim.conv2d(of2, dims_list[1], [1, 1],
+                          padding='SAME',
+                          scope='lateral/res{}'.format(2))
+
+    upsample2_of3 = slim.conv2d(of3, dims_list[1], [1, 1],
+                           padding='SAME',
+                           scope='merge/res{}'.format(2))
+    upsample2 = tf.keras.layers.UpSampling2D(data_format='channels_last' )(upsample2_of3)
+
+    fem_2 = lateral2 * upsample2
+
+
+
+    lateral1 = slim.conv2d(of1, dims_list[0], [1, 1],
+                           padding='SAME',
+                           scope='lateral/res{}'.format(1))
+
+    upsample1_of2 = slim.conv2d(of2, dims_list[0], [1, 1],
+                            padding='SAME',
+                            scope='merge/res{}'.format(1))
+    upsample1 = tf.keras.layers.UpSampling2D(data_format='channels_last')(upsample1_of2)
+
+    fem_1 = lateral1 * upsample1
+
+    #####enhance model
+    fpn_fms = [fem_1, fem_2, upsample2_of3]
+
+
+    return fpn_fms
+
+def shufflenet_v2_fpn_cpm(inputs,is_training=True,depth_multiplier='0.75'):
+    possibilities = {'0.5': 48,'0.75':64, '1.0': 116, '1.5': 176, '2.0': 224}
+    initial_depth = possibilities[depth_multiplier]
+
+    arg_scope = shufflenet_arg_scope()
+    with slim.arg_scope(arg_scope):
+        with slim.arg_scope([slim.batch_norm], is_training=is_training):
+            with tf.variable_scope('ShuffleNetV2'):
+
+                net = slim.conv2d(inputs, 16, [3, 3],stride=2, activation_fn=tf.nn.relu,
+                                  normalizer_fn=slim.batch_norm, scope='init_conv')
+
+                net = slim.separable_conv2d(net, 24, [3, 3], stride=2, activation_fn=tf.nn.relu,
+                                          normalizer_fn=slim.batch_norm, scope='init_conv_2', depth_multiplier=1)
+
+                block1 = block(net, num_units=2, out_channels=initial_depth, scope='Stage2')
+
+                block2 = block(block1, num_units=4, out_channels=initial_depth*2, scope='Stage3')
+
+                block3 = block(block2, num_units=2, out_channels=initial_depth*2, scope='Stage4')
+
+            with tf.variable_scope('fpn'):
+                fpn_fms=create_fpn_net([block1,block2,block3],dims_list=cfg.MODEL.fpn_dims)
+
+
+
+            # with tf.variable_scope('cpm'):
+            #     global_fems_fms = []
+            #
+            #     for i, fem in enumerate(fpn_fms):
+            #         tmp_res = cpm(fem, dim=cfg.MODEL.cpm_dims[i],scope='fem%d' % i)
+            #         global_fems_fms.append(tmp_res)
+
+    return fpn_fms
 
 
 

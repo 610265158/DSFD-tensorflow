@@ -7,7 +7,7 @@ import numpy as np
 from lib.core.anchor.box_utils import batch_decode
 
 
-from lib.core.model.net.light.lightnet import shufflenet_v2
+from lib.core.model.net.light.lightnet import shufflenet_v2,shufflenet_v2_fpn_cpm
 
 from lib.core.model.net.ssd_loss import ssd_loss
 from train_config import config as cfg
@@ -23,10 +23,8 @@ from lib.core.anchor.anchor import anchor_tools
 class DSFD():
 
     def __init__(self,):
-
-
-
-        self.ssd_backbone=shufflenet_v2                 ### it is a func
+        self.ssd_backbone = shufflenet_v2_fpn_cpm  ### it is a func
+        #self.ssd_backbone=shufflenet_v2                 ### it is a func
         self.ssd_head=SSDHead()                         ### it is a class
 
 
@@ -36,9 +34,8 @@ class DSFD():
         inputs=self.preprocess(inputs)
 
         ### extract feature maps
-        final_fm,endpoints=self.ssd_backbone(inputs,training_flag)
+        origin_fms=self.ssd_backbone(inputs,training_flag)
 
-        origin_fms=[endpoints['stage2'],endpoints['stage3'],endpoints['stage4']]
 
         print(origin_fms)
         ### head, regresssion and class

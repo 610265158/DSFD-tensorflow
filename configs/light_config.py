@@ -82,7 +82,7 @@ config.MODEL.model_path = './model/'  # save directory
 config.MODEL.net_structure='Lightnet' ######'resnet_v1_50,resnet_v1_101,MobilenetV2
 config.MODEL.pretrained_model=None
 config.MODEL.fpn_dims=[96,96,96]
-config.MODEL.cpm_dims=[128,128,128]
+config.MODEL.cpm_dims=[96,128,128]
 
 
 config.MODEL.fpn=True
